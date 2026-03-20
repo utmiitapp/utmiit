@@ -601,14 +601,15 @@ function setZoom(idx) {
   const vw    = window.innerWidth;
 
   // Реальная ширина — скролл работает нативно
-  img.style.width  = Math.round(vw * scale) + 'px';
+  const baseW = Math.min(vw, 520); // на ПК базовая ширина ограничена 520px
+  img.style.width  = Math.round(baseW * scale) + 'px';
   img.style.transform = '';
   label.textContent = Math.round(scale * 100) + '%';
 
   // При зуме > 1 центрируем горизонтально
   if (scale > 1) {
-    const excess = Math.round(vw * scale) - vw;
-    box.scrollLeft = excess / 2;
+    const excess = Math.round(baseW * scale) - vw;
+    box.scrollLeft = excess > 0 ? excess / 2 : 0;
   } else {
     box.scrollLeft = 0;
   }
