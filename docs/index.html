@@ -381,6 +381,7 @@ async function loadSchedule(d, silent = false) {
     const data = await fetchManifest(d);
 
     hashes[d] = data.hash;
+    const cacheKey = data.updated_at || data.hash || Date.now();
 
     if (data.pages > 1 && !silent) showSt('prog');
     const box = document.getElementById('pages');
@@ -389,12 +390,12 @@ async function loadSchedule(d, silent = false) {
     const altExt = ext === 'jpg' ? 'png' : 'jpg';
     for (let i = 0; i < data.pages; i++) {
       const img = new Image();
-      img.src = `${STATIC_BASE}/${d}/page-${i+1}.${ext}?hash=${data.hash}`;
+      img.src = `${STATIC_BASE}/${d}/page-${i+1}.${ext}?v=${encodeURIComponent(cacheKey)}`;
       img.loading = 'lazy';
       img.onerror = () => {
         if (img.dataset.fallback) return;
         img.dataset.fallback = '1';
-        img.src = `${STATIC_BASE}/${d}/page-${i+1}.${altExt}?hash=${data.hash}`;
+        img.src = `${STATIC_BASE}/${d}/page-${i+1}.${altExt}?v=${encodeURIComponent(cacheKey)}`;
       };
       img.onclick = () => openLightbox(img.src);
       const wrap = document.createElement('div');
@@ -623,7 +624,7 @@ function toast(msg) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=14', { scope: './' });
+  navigator.serviceWorker.register('./sw.js?v=15', { scope: './' });
 }
 </script>
 </body>

@@ -1,4 +1,4 @@
-const CACHE = 'schedule-v14';
+const CACHE = 'schedule-v15';
 const ROOT = new URL('./', self.location).pathname;
 const INDEX = new URL('./index.html', self.location).pathname;
 const MANIFEST = new URL('./manifest.json', self.location).pathname;
