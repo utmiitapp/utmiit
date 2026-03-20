@@ -28,7 +28,7 @@
       --brd: rgba(255,255,255,.08); --shad: 0 2px 16px rgba(0,0,0,.5);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: pan-x pan-y pinch-zoom; }
     ::-webkit-scrollbar { display: none; }
     body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; overscroll-behavior: none; transition: background .2s, color .2s; }
     #app { max-width: 520px; margin: 0 auto; padding: 0 14px 90px; }
@@ -283,7 +283,7 @@ const NOTE_MAX = 500;
 
 const tg = window.Telegram?.WebApp;
 const isTgWebApp = !!(tg && (tg.initData || (tg.initDataUnsafe && Object.keys(tg.initDataUnsafe).length)));
-if (isTgWebApp) { tg.ready(); tg.expand(); }
+if (isTgWebApp) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.(); }
 
 const DAYS   = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 const DNAMES = {monday:'Понедельник',tuesday:'Вторник',wednesday:'Среда',thursday:'Четверг',friday:'Пятница',saturday:'Суббота',general:'Общая'};
