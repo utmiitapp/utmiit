@@ -598,21 +598,22 @@ function setZoom(idx) {
   const box   = document.getElementById('lightbox');
   const img   = document.getElementById('lightbox-img');
   const label = document.getElementById('lb-zoom');
-  const vw    = window.innerWidth;
 
-  // Реальная ширина — скролл работает нативно
-  const baseW = Math.min(vw, 520); // на ПК базовая ширина ограничена 520px
-  img.style.width  = Math.round(baseW * scale) + 'px';
-  img.style.transform = '';
+  if (lbZoomIdx === 0) {
+    img.style.width = '';
+    label.textContent = '100%';
+    box.scrollLeft = 0;
+    return;
+  }
+
+  // Сбрасываем width чтобы получить естественную ширину
+  img.style.width = '';
+  const baseW = img.offsetWidth;
+  img.style.width = Math.round(baseW * scale) + 'px';
   label.textContent = Math.round(scale * 100) + '%';
 
-  // При зуме > 1 центрируем горизонтально
-  if (scale > 1) {
-    const excess = Math.round(baseW * scale) - vw;
-    box.scrollLeft = excess > 0 ? excess / 2 : 0;
-  } else {
-    box.scrollLeft = 0;
-  }
+  const excess = Math.round(baseW * scale) - window.innerWidth;
+  box.scrollLeft = excess > 0 ? excess / 2 : 0;
 }
 function zoomIn()    { setZoom(lbZoomIdx + 1); }
 function zoomOut()   { setZoom(lbZoomIdx - 1); }
