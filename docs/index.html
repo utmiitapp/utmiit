@@ -111,9 +111,9 @@
     #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; cursor: zoom-out; overflow: auto; padding: 16px 12px 72px; align-items: center; justify-content: center; }
     #lightbox.open { display: flex; animation: fadeIn .2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    #lightbox-inner { width: 100%; max-width: 900px; margin: 0 auto; }
-    #lightbox img { width: 100%; height: auto; object-fit: contain; border-radius: 4px; display: block; margin: 0 auto; }
-    #lightbox-tools { position: fixed; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: row; gap: 8px; z-index: 510; }
+    #lightbox-inner { width: 100%; max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+    #lightbox img { max-width: 100%; width: auto; height: auto; object-fit: contain; border-radius: 4px; display: block; margin: 0 auto; }
+    #lightbox-tools { position: fixed; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; z-index: 510; }
     .lb-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--brd); background: var(--surf); color: var(--text); font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shad); cursor: pointer; }
     .lb-btn:active { transform: scale(.92); }
     .prog-bg { width: 100%; height: 4px; background: var(--surf2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
@@ -258,12 +258,12 @@
 </div>
 
 <div id="lightbox">
-  <div id="lightbox-tools" onclick="event.stopPropagation()">
+  <div id="lightbox-tools">
     <button class="lb-btn" onclick="zoomBy(-0.5)">-</button>
     <button class="lb-btn" id="lb-zoom" onclick="setZoom(1)">1x</button>
     <button class="lb-btn" onclick="zoomBy(0.5)">+</button>
   </div>
-  <div id="lightbox-inner" onclick="event.stopPropagation()">
+  <div id="lightbox-inner">
     <img id="lightbox-img" src="" alt=""/>
   </div>
 </div>
@@ -654,7 +654,7 @@ function toast(msg) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=18', { scope: './' });
+  navigator.serviceWorker.register('./sw.js?v=19', { scope: './' });
 }
 </script>
 </body>
