@@ -108,8 +108,8 @@
     .img-share svg { width: 18px; height: 18px; }
     .img-share:active { transform: scale(.92); }
 
-    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; cursor: zoom-out; overflow: auto; padding: 56px 12px 72px; }
-    #lightbox.open { display: block; animation: fadeIn .2s ease; }
+    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; cursor: zoom-out; overflow: auto; padding: 16px 12px 72px; align-items: center; justify-content: center; }
+    #lightbox.open { display: flex; animation: fadeIn .2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     #lightbox-inner { width: 100%; max-width: 900px; margin: 0 auto; }
     #lightbox img { width: 100%; height: auto; object-fit: contain; border-radius: 4px; display: block; margin: 0 auto; }
@@ -259,9 +259,9 @@
 
 <div id="lightbox">
   <div id="lightbox-tools" onclick="event.stopPropagation()">
-    <button class="lb-btn" onclick="zoomOut()">-</button>
-    <button class="lb-btn" id="lb-zoom" onclick="resetZoom()">1x</button>
-    <button class="lb-btn" onclick="zoomIn()">+</button>
+    <button class="lb-btn" onclick="zoomBy(-0.5)">-</button>
+    <button class="lb-btn" id="lb-zoom" onclick="setZoom(1)">1x</button>
+    <button class="lb-btn" onclick="zoomBy(0.5)">+</button>
   </div>
   <div id="lightbox-inner" onclick="event.stopPropagation()">
     <img id="lightbox-img" src="" alt=""/>
@@ -590,34 +590,32 @@ function updateBadge() {
 }
 
 let lbZoom = 1;
+const lightboxEl = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+const lightboxZoom = document.getElementById('lb-zoom');
+
 function setZoom(z) {
   lbZoom = Math.min(4, Math.max(1, z));
-  const img = document.getElementById('lightbox-img');
-  const label = document.getElementById('lb-zoom');
-  img.style.width = (lbZoom * 100) + '%';
-  label.textContent = lbZoom + 'x';
+  lightboxImg.style.width = (lbZoom * 100) + '%';
+  lightboxZoom.textContent = lbZoom + 'x';
 }
-function zoomIn() { setZoom(lbZoom + 0.5); }
-function zoomOut() { setZoom(lbZoom - 0.5); }
-function resetZoom() { setZoom(1); }
+function zoomBy(step) { setZoom(lbZoom + step); }
 
 function openLightbox(src) {
-  const box = document.getElementById('lightbox');
-  const img = document.getElementById('lightbox-img');
-  img.src = src;
-  box.classList.add('open');
+  lightboxImg.src = src;
+  lightboxEl.classList.add('open');
   document.body.style.overflow = 'hidden';
   setZoom(1);
-  box.scrollTop = 0;
-  box.scrollLeft = 0;
+  lightboxEl.scrollTop = 0;
+  lightboxEl.scrollLeft = 0;
 }
 function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
+  lightboxEl.classList.remove('open');
   document.body.style.overflow = '';
 }
 
-document.getElementById('lightbox').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) closeLightbox();
+lightboxEl.addEventListener('click', (e) => {
+  if (e.target === lightboxEl) closeLightbox();
 });
 
 async function shareImage(url) {
@@ -656,7 +654,7 @@ function toast(msg) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=17', { scope: './' });
+  navigator.serviceWorker.register('./sw.js?v=18', { scope: './' });
 }
 </script>
 </body>
