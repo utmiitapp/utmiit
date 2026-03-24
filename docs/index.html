@@ -108,13 +108,11 @@
     .img-share svg { width: 18px; height: 18px; }
     .img-share:active { transform: scale(.92); }
 
-    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; cursor: zoom-out; overflow: auto; padding: 16px 12px 72px; align-items: center; justify-content: center; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; }
-    #lightbox.open { display: flex; animation: fadeIn .2s ease; }
-    #lightbox.zoomed { align-items: flex-start; }
+    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; overflow: hidden; touch-action: none; }
+    #lightbox.open { display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    #lightbox-inner { width: 100%; max-width: 900px; margin: 0 auto; }
-    #lightbox.zoomed #lightbox-inner { max-width: none; }
-    #lightbox img { width: 100%; height: auto; object-fit: contain; border-radius: 4px; display: block; margin: 0 auto; }
+    #lightbox-inner { touch-action: none; will-change: transform; }
+    #lightbox img { display: block; height: auto; border-radius: 4px; width: 100vw; max-width: 900px; pointer-events: none; user-select: none; }
     #lightbox-tools { position: fixed; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; z-index: 510; }
     .lb-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--brd); background: var(--surf); color: var(--text); font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shad); cursor: pointer; }
     .lb-btn:active { transform: scale(.92); }
@@ -591,27 +589,88 @@ function updateBadge() {
   document.getElementById('notes-badge').classList.toggle('on', ALL_DAYS.some(d => localStorage.getItem(nk(d))));
 }
 
-let lbZoom = 1;
-const lightboxEl = document.getElementById('lightbox');
+const ZOOM_STEPS = [1, 1.25, 1.5, 1.75, 2];
+let lbZoomIdx = 0;
+let lbTx = 0, lbTy = 0;
+let lbDragStart = null;
+
+const lightboxEl  = document.getElementById('lightbox');
 const lightboxInner = document.getElementById('lightbox-inner');
 const lightboxImg = document.getElementById('lightbox-img');
 const lightboxZoom = document.getElementById('lb-zoom');
 
-function setZoom(z) {
-  lbZoom = Math.min(4, Math.max(1, z));
-  lightboxInner.style.width = (lbZoom * 100) + '%';
-  lightboxZoom.textContent = lbZoom + 'x';
-  lightboxEl.classList.toggle('zoomed', lbZoom > 1);
+function applyTransform() {
+  lightboxInner.style.transform = `translate(${lbTx}px, ${lbTy}px) scale(${ZOOM_STEPS[lbZoomIdx]})`;
 }
-function zoomBy(step) { setZoom(lbZoom + step); }
+
+function clampTranslate() {
+  const scale = ZOOM_STEPS[lbZoomIdx];
+  const iw = lightboxImg.offsetWidth * scale;
+  const ih = lightboxImg.offsetHeight * scale;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const mx = Math.max(0, (iw - vw) / 2);
+  const my = Math.max(0, (ih - vh) / 2);
+  lbTx = Math.min(mx, Math.max(-mx, lbTx));
+  lbTy = Math.min(my, Math.max(-my, lbTy));
+}
+
+function setZoom(idx) {
+  lbZoomIdx = Math.max(0, Math.min(ZOOM_STEPS.length - 1, idx));
+  if (lbZoomIdx === 0) { lbTx = 0; lbTy = 0; }
+  else clampTranslate();
+  applyTransform();
+  lightboxZoom.textContent = Math.round(ZOOM_STEPS[lbZoomIdx] * 100) + '%';
+}
+function zoomBy(step) { setZoom(lbZoomIdx + (step > 0 ? 1 : -1)); }
+
+// Перетаскивание пальцем
+lightboxEl.addEventListener('touchstart', e => {
+  if (e.touches.length === 1 && lbZoomIdx > 0) {
+    lbDragStart = { x: e.touches[0].clientX - lbTx, y: e.touches[0].clientY - lbTy };
+  }
+}, { passive: true });
+
+lightboxEl.addEventListener('touchmove', e => {
+  if (e.touches.length === 1 && lbDragStart && lbZoomIdx > 0) {
+    e.stopPropagation();
+    lbTx = e.touches[0].clientX - lbDragStart.x;
+    lbTy = e.touches[0].clientY - lbDragStart.y;
+    clampTranslate();
+    applyTransform();
+  }
+}, { passive: true });
+
+lightboxEl.addEventListener('touchend', () => { lbDragStart = null; });
+
+// Мышь (ПК)
+lightboxEl.addEventListener('mousedown', e => {
+  if (lbZoomIdx > 0) {
+    lbDragStart = { x: e.clientX - lbTx, y: e.clientY - lbTy };
+    lightboxEl.style.cursor = 'grabbing';
+  }
+});
+lightboxEl.addEventListener('mousemove', e => {
+  if (lbDragStart && lbZoomIdx > 0) {
+    lbTx = e.clientX - lbDragStart.x;
+    lbTy = e.clientY - lbDragStart.y;
+    clampTranslate();
+    applyTransform();
+  }
+});
+lightboxEl.addEventListener('mouseup', () => {
+  lbDragStart = null;
+  lightboxEl.style.cursor = '';
+});
 
 function openLightbox(src) {
+  if (isTgWebApp && tg.openLink) { tg.openLink(src); return; }
   lightboxImg.src = src;
   lightboxEl.classList.add('open');
   document.body.style.overflow = 'hidden';
-  setZoom(1);
-  lightboxEl.scrollTop = 0;
-  lightboxEl.scrollLeft = 0;
+  lbZoomIdx = 0; lbTx = 0; lbTy = 0;
+  lightboxInner.style.transform = '';
+  lightboxZoom.textContent = '100%';
 }
 function closeLightbox() {
   lightboxEl.classList.remove('open');
@@ -619,7 +678,7 @@ function closeLightbox() {
 }
 
 lightboxEl.addEventListener('click', (e) => {
-  if (e.target === lightboxEl) closeLightbox();
+  if (e.target === lightboxEl && lbZoomIdx === 0) closeLightbox();
 });
 
 async function shareImage(url) {
@@ -658,7 +717,7 @@ function toast(msg) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=21', { scope: './' });
+  navigator.serviceWorker.register('./sw.js?v=20', { scope: './' });
 }
 </script>
 </body>
