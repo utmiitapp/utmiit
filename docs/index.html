@@ -108,11 +108,13 @@
     .img-share svg { width: 18px; height: 18px; }
     .img-share:active { transform: scale(.92); }
 
-    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; cursor: zoom-out; overflow: auto; padding: 16px; align-items: center; justify-content: center; }
+    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; cursor: zoom-out; overflow: auto; padding: 16px 12px 72px; align-items: center; justify-content: center; -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; }
     #lightbox.open { display: flex; animation: fadeIn .2s ease; }
+    #lightbox.zoomed { align-items: flex-start; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    #lightbox-inner { width: 100%; max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
-    #lightbox img { max-width: none; width: 100%; height: auto; object-fit: contain; border-radius: 4px; display: block; margin: 0 auto; }
+    #lightbox-inner { width: 100%; max-width: 900px; margin: 0 auto; }
+    #lightbox.zoomed #lightbox-inner { max-width: none; }
+    #lightbox img { width: 100%; height: auto; object-fit: contain; border-radius: 4px; display: block; margin: 0 auto; }
     #lightbox-tools { position: fixed; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; z-index: 510; }
     .lb-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--brd); background: var(--surf); color: var(--text); font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shad); cursor: pointer; }
     .lb-btn:active { transform: scale(.92); }
@@ -591,13 +593,15 @@ function updateBadge() {
 
 let lbZoom = 1;
 const lightboxEl = document.getElementById('lightbox');
+const lightboxInner = document.getElementById('lightbox-inner');
 const lightboxImg = document.getElementById('lightbox-img');
 const lightboxZoom = document.getElementById('lb-zoom');
 
 function setZoom(z) {
   lbZoom = Math.min(4, Math.max(1, z));
-  lightboxImg.style.width = (lbZoom * 100) + '%';
+  lightboxInner.style.width = (lbZoom * 100) + '%';
   lightboxZoom.textContent = lbZoom + 'x';
+  lightboxEl.classList.toggle('zoomed', lbZoom > 1);
 }
 function zoomBy(step) { setZoom(lbZoom + step); }
 
@@ -654,7 +658,7 @@ function toast(msg) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=20', { scope: './' });
+  navigator.serviceWorker.register('./sw.js?v=21', { scope: './' });
 }
 </script>
 </body>
