@@ -590,78 +590,52 @@ function updateBadge() {
 }
 
 const ZOOM_STEPS = [1, 1.25, 1.5, 1.75, 2];
-let lbZoomIdx = 0;
-let lbTx = 0, lbTy = 0;
-let lbDragStart = null;
+let lbZoomIdx = 0, lbTx = 0, lbTy = 0, lbDrag = null;
 
-const lightboxEl  = document.getElementById('lightbox');
+const lightboxEl    = document.getElementById('lightbox');
 const lightboxInner = document.getElementById('lightbox-inner');
-const lightboxImg = document.getElementById('lightbox-img');
-const lightboxZoom = document.getElementById('lb-zoom');
+const lightboxImg   = document.getElementById('lightbox-img');
+const lightboxZoom  = document.getElementById('lb-zoom');
 
-function applyTransform() {
-  lightboxInner.style.transform = `translate(${lbTx}px, ${lbTy}px) scale(${ZOOM_STEPS[lbZoomIdx]})`;
-}
-
-function clampTranslate() {
-  const scale = ZOOM_STEPS[lbZoomIdx];
-  const iw = lightboxImg.offsetWidth * scale;
-  const ih = lightboxImg.offsetHeight * scale;
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  const mx = Math.max(0, (iw - vw) / 2);
-  const my = Math.max(0, (ih - vh) / 2);
+function lbApply() {
+  const s = ZOOM_STEPS[lbZoomIdx];
+  const mx = Math.max(0, (lightboxImg.offsetWidth  * s - window.innerWidth)  / 2);
+  const my = Math.max(0, (lightboxImg.offsetHeight * s - window.innerHeight) / 2);
   lbTx = Math.min(mx, Math.max(-mx, lbTx));
   lbTy = Math.min(my, Math.max(-my, lbTy));
+  lightboxInner.style.transform = `translate(${lbTx}px,${lbTy}px) scale(${s})`;
 }
 
 function setZoom(idx) {
   lbZoomIdx = Math.max(0, Math.min(ZOOM_STEPS.length - 1, idx));
   if (lbZoomIdx === 0) { lbTx = 0; lbTy = 0; }
-  else clampTranslate();
-  applyTransform();
+  lbApply();
   lightboxZoom.textContent = Math.round(ZOOM_STEPS[lbZoomIdx] * 100) + '%';
 }
 function zoomBy(step) { setZoom(lbZoomIdx + (step > 0 ? 1 : -1)); }
 
-// Перетаскивание пальцем
 lightboxEl.addEventListener('touchstart', e => {
-  if (e.touches.length === 1 && lbZoomIdx > 0) {
-    lbDragStart = { x: e.touches[0].clientX - lbTx, y: e.touches[0].clientY - lbTy };
-  }
+  if (e.touches.length === 1 && lbZoomIdx > 0)
+    lbDrag = { x: e.touches[0].clientX - lbTx, y: e.touches[0].clientY - lbTy };
 }, { passive: true });
 
 lightboxEl.addEventListener('touchmove', e => {
-  if (e.touches.length === 1 && lbDragStart && lbZoomIdx > 0) {
-    e.stopPropagation();
-    lbTx = e.touches[0].clientX - lbDragStart.x;
-    lbTy = e.touches[0].clientY - lbDragStart.y;
-    clampTranslate();
-    applyTransform();
+  if (lbDrag && lbZoomIdx > 0) {
+    lbTx = e.touches[0].clientX - lbDrag.x;
+    lbTy = e.touches[0].clientY - lbDrag.y;
+    lbApply();
   }
 }, { passive: true });
 
-lightboxEl.addEventListener('touchend', () => { lbDragStart = null; });
+lightboxEl.addEventListener('touchend', () => lbDrag = null);
 
-// Мышь (ПК)
 lightboxEl.addEventListener('mousedown', e => {
-  if (lbZoomIdx > 0) {
-    lbDragStart = { x: e.clientX - lbTx, y: e.clientY - lbTy };
-    lightboxEl.style.cursor = 'grabbing';
-  }
+  if (lbZoomIdx > 0) { lbDrag = { x: e.clientX - lbTx, y: e.clientY - lbTy }; lightboxEl.style.cursor = 'grabbing'; }
 });
 lightboxEl.addEventListener('mousemove', e => {
-  if (lbDragStart && lbZoomIdx > 0) {
-    lbTx = e.clientX - lbDragStart.x;
-    lbTy = e.clientY - lbDragStart.y;
-    clampTranslate();
-    applyTransform();
-  }
+  if (lbDrag && lbZoomIdx > 0) { lbTx = e.clientX - lbDrag.x; lbTy = e.clientY - lbDrag.y; lbApply(); }
 });
-lightboxEl.addEventListener('mouseup', () => {
-  lbDragStart = null;
-  lightboxEl.style.cursor = '';
-});
+lightboxEl.addEventListener('mouseup', () => { lbDrag = null; lightboxEl.style.cursor = ''; });
 
 function openLightbox(src) {
   if (isTgWebApp && tg.openLink) { tg.openLink(src); return; }
@@ -677,7 +651,7 @@ function closeLightbox() {
   document.body.style.overflow = '';
 }
 
-lightboxEl.addEventListener('click', (e) => {
+lightboxEl.addEventListener('click', e => {
   if (e.target === lightboxEl && lbZoomIdx === 0) closeLightbox();
 });
 
