@@ -113,9 +113,6 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     #lightbox-inner { touch-action: none; will-change: transform; }
     #lightbox img { display: block; height: auto; border-radius: 4px; width: 100vw; max-width: 900px; pointer-events: none; user-select: none; }
-    #lightbox-tools { position: fixed; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; z-index: 510; }
-    .lb-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--brd); background: var(--surf); color: var(--text); font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shad); cursor: pointer; }
-    .lb-btn:active { transform: scale(.92); }
     .prog-bg { width: 100%; height: 4px; background: var(--surf2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
     .prog-fill { height: 4px; background: var(--acc); border-radius: 4px; width: 0; transition: width .2s; }
     .dlnk { display: none; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; color: var(--acc); text-decoration: none; border-top: 1px solid var(--brd); }
@@ -258,11 +255,6 @@
 </div>
 
 <div id="lightbox">
-  <div id="lightbox-tools">
-    <button class="lb-btn" onclick="zoomBy(-0.5)">-</button>
-    <button class="lb-btn" id="lb-zoom" onclick="setZoom(1)">1x</button>
-    <button class="lb-btn" onclick="zoomBy(0.5)">+</button>
-  </div>
   <div id="lightbox-inner">
     <img id="lightbox-img" src="" alt=""/>
   </div>
@@ -589,62 +581,14 @@ function updateBadge() {
   document.getElementById('notes-badge').classList.toggle('on', ALL_DAYS.some(d => localStorage.getItem(nk(d))));
 }
 
-const ZOOM_STEPS = [1, 1.25, 1.5, 1.75, 2];
-let lbZoomIdx = 0, lbTx = 0, lbTy = 0, lbDrag = null;
-
-const lightboxEl    = document.getElementById('lightbox');
-const lightboxInner = document.getElementById('lightbox-inner');
-const lightboxImg   = document.getElementById('lightbox-img');
-const lightboxZoom  = document.getElementById('lb-zoom');
-
-function lbApply() {
-  const s = ZOOM_STEPS[lbZoomIdx];
-  const mx = Math.max(0, (lightboxImg.offsetWidth  * s - window.innerWidth)  / 2);
-  const my = Math.max(0, (lightboxImg.offsetHeight * s - window.innerHeight) / 2);
-  lbTx = Math.min(mx, Math.max(-mx, lbTx));
-  lbTy = Math.min(my, Math.max(-my, lbTy));
-  lightboxInner.style.transform = `translate(${lbTx}px,${lbTy}px) scale(${s})`;
-}
-
-function setZoom(idx) {
-  lbZoomIdx = Math.max(0, Math.min(ZOOM_STEPS.length - 1, idx));
-  if (lbZoomIdx === 0) { lbTx = 0; lbTy = 0; }
-  lbApply();
-  lightboxZoom.textContent = Math.round(ZOOM_STEPS[lbZoomIdx] * 100) + '%';
-}
-function zoomBy(step) { setZoom(lbZoomIdx + (step > 0 ? 1 : -1)); }
-
-lightboxEl.addEventListener('touchstart', e => {
-  if (e.touches.length === 1 && lbZoomIdx > 0)
-    lbDrag = { x: e.touches[0].clientX - lbTx, y: e.touches[0].clientY - lbTy };
-}, { passive: true });
-
-lightboxEl.addEventListener('touchmove', e => {
-  if (lbDrag && lbZoomIdx > 0) {
-    lbTx = e.touches[0].clientX - lbDrag.x;
-    lbTy = e.touches[0].clientY - lbDrag.y;
-    lbApply();
-  }
-}, { passive: true });
-
-lightboxEl.addEventListener('touchend', () => lbDrag = null);
-
-lightboxEl.addEventListener('mousedown', e => {
-  if (lbZoomIdx > 0) { lbDrag = { x: e.clientX - lbTx, y: e.clientY - lbTy }; lightboxEl.style.cursor = 'grabbing'; }
-});
-lightboxEl.addEventListener('mousemove', e => {
-  if (lbDrag && lbZoomIdx > 0) { lbTx = e.clientX - lbDrag.x; lbTy = e.clientY - lbDrag.y; lbApply(); }
-});
-lightboxEl.addEventListener('mouseup', () => { lbDrag = null; lightboxEl.style.cursor = ''; });
+const lightboxEl  = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
 
 function openLightbox(src) {
   if (isTgWebApp && tg.openLink) { tg.openLink(src); return; }
   lightboxImg.src = src;
   lightboxEl.classList.add('open');
   document.body.style.overflow = 'hidden';
-  lbZoomIdx = 0; lbTx = 0; lbTy = 0;
-  lightboxInner.style.transform = '';
-  lightboxZoom.textContent = '100%';
 }
 function closeLightbox() {
   lightboxEl.classList.remove('open');
@@ -652,7 +596,7 @@ function closeLightbox() {
 }
 
 lightboxEl.addEventListener('click', e => {
-  if (e.target === lightboxEl && lbZoomIdx === 0) closeLightbox();
+  if (e.target === lightboxEl) closeLightbox();
 });
 
 async function shareImage(url) {
