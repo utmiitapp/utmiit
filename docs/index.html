@@ -108,11 +108,11 @@
     .img-share svg { width: 18px; height: 18px; }
     .img-share:active { transform: scale(.92); }
 
-    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; overflow: hidden; touch-action: none; }
+    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; overflow: auto; touch-action: pan-x pan-y pinch-zoom; }
     #lightbox.open { display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    #lightbox-inner { touch-action: none; will-change: transform; }
-    #lightbox img { display: block; height: auto; border-radius: 4px; width: 100vw; max-width: 900px; pointer-events: none; user-select: none; }
+    #lightbox-inner { display: flex; justify-content: center; min-width: 100%; }
+    #lightbox img { display: block; height: auto; border-radius: 4px; width: 100%; max-width: 900px; }
     .prog-bg { width: 100%; height: 4px; background: var(--surf2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
     .prog-fill { height: 4px; background: var(--acc); border-radius: 4px; width: 0; transition: width .2s; }
     .dlnk { display: none; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; color: var(--acc); text-decoration: none; border-top: 1px solid var(--brd); }
