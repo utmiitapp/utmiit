@@ -112,7 +112,7 @@
     #lightbox.open { display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     #lightbox-inner { display: flex; justify-content: center; min-width: 100%; }
-    #lightbox img { display: block; height: auto; border-radius: 4px; width: 100%; max-width: 900px; }
+    #lightbox img { display: block; height: auto; border-radius: 4px; width: 100%; max-width: 900px; transition: transform .25s ease; }
     .prog-bg { width: 100%; height: 4px; background: var(--surf2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
     .prog-fill { height: 4px; background: var(--acc); border-radius: 4px; width: 0; transition: width .2s; }
     .dlnk { display: none; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; color: var(--acc); text-decoration: none; border-top: 1px solid var(--brd); }
@@ -584,6 +584,8 @@ function updateBadge() {
 const lightboxEl  = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-img');
 
+let lbLastTap = 0;
+
 function openLightbox(src) {
   if (isTgWebApp && tg.openLink) { tg.openLink(src); return; }
   lightboxImg.src = src;
@@ -593,11 +595,33 @@ function openLightbox(src) {
 function closeLightbox() {
   lightboxEl.classList.remove('open');
   document.body.style.overflow = '';
+  lightboxImg.style.transform = '';
+  lightboxImg.style.transformOrigin = '';
 }
 
 lightboxEl.addEventListener('click', e => {
   if (e.target === lightboxEl) closeLightbox();
 });
+
+lightboxEl.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lbLastTap < 300) {
+    // Двойной тап — переключаем zoom через CSS
+    const img = lightboxImg;
+    if (img.style.transform === 'scale(2)') {
+      img.style.transform = '';
+      img.style.transformOrigin = '';
+    } else {
+      const rect = img.getBoundingClientRect();
+      const t = e.changedTouches[0];
+      const ox = ((t.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%';
+      const oy = ((t.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%';
+      img.style.transformOrigin = `${ox} ${oy}`;
+      img.style.transform = 'scale(2)';
+    }
+  }
+  lbLastTap = now;
+}, { passive: true });
 
 async function shareImage(url) {
   if (isTgWebApp) {
