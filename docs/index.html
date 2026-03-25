@@ -111,8 +111,12 @@
     #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; overflow: auto; touch-action: pan-x pan-y pinch-zoom; }
     #lightbox.open { display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    #lightbox-inner { display: flex; justify-content: center; min-width: 100%; }
-    #lightbox img { display: block; height: auto; border-radius: 4px; width: 100%; max-width: 900px; transition: transform .25s ease; }
+    #lightbox-inner { width: 100%; max-width: 900px; margin: 0 auto; }
+    #lightbox.zoomed #lightbox-inner { max-width: none; }
+    #lightbox img { width: 100%; height: auto; object-fit: contain; border-radius: 4px; display: block; margin: 0 auto; touch-action: pan-x pan-y; }
+    #lightbox-tools { position: fixed; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; z-index: 510; }
+    .lb-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--brd); background: var(--surf); color: var(--text); font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shad); cursor: pointer; }
+    .lb-btn:active { transform: scale(.92); }
     .prog-bg { width: 100%; height: 4px; background: var(--surf2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
     .prog-fill { height: 4px; background: var(--acc); border-radius: 4px; width: 0; transition: width .2s; }
     .dlnk { display: none; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; color: var(--acc); text-decoration: none; border-top: 1px solid var(--brd); }
@@ -581,10 +585,20 @@ function updateBadge() {
   document.getElementById('notes-badge').classList.toggle('on', ALL_DAYS.some(d => localStorage.getItem(nk(d))));
 }
 
-const lightboxEl  = document.getElementById('lightbox');
+const lightboxEl = document.getElementById('lightbox');
+const lightboxInner = document.getElementById('lightbox-inner');
 const lightboxImg = document.getElementById('lightbox-img');
+const lightboxZoom = document.getElementById('lb-zoom');
+let lbZoom = 1;
 
-let lbLastTap = 0;
+function setZoom(z) {
+  lbZoom = Math.min(4, Math.max(1, z));
+  lightboxInner.style.width = (lbZoom * 100) + '%';
+  lightboxZoom.textContent = lbZoom + 'x';
+  lightboxEl.classList.toggle('zoomed', lbZoom > 1);
+}
+function zoomBy(step) { setZoom(lbZoom + step); }
+function toggleZoom() { setZoom(lbZoom === 1 ? 2 : 1); }
 
 function openLightbox(src) {
   if (isTgWebApp && tg.openLink) { tg.openLink(src); return; }
@@ -595,33 +609,26 @@ function openLightbox(src) {
 function closeLightbox() {
   lightboxEl.classList.remove('open');
   document.body.style.overflow = '';
-  lightboxImg.style.transform = '';
-  lightboxImg.style.transformOrigin = '';
 }
 
 lightboxEl.addEventListener('click', e => {
   if (e.target === lightboxEl) closeLightbox();
 });
 
-lightboxEl.addEventListener('touchend', e => {
+const DOUBLE_TAP_MS = 280;
+let lastTap = 0;
+lightboxImg.addEventListener('dblclick', (e) => {
+  e.preventDefault();
+  toggleZoom();
+});
+lightboxImg.addEventListener('touchend', (e) => {
   const now = Date.now();
-  if (now - lbLastTap < 300) {
-    // Двойной тап — переключаем zoom через CSS
-    const img = lightboxImg;
-    if (img.style.transform === 'scale(2)') {
-      img.style.transform = '';
-      img.style.transformOrigin = '';
-    } else {
-      const rect = img.getBoundingClientRect();
-      const t = e.changedTouches[0];
-      const ox = ((t.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%';
-      const oy = ((t.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%';
-      img.style.transformOrigin = `${ox} ${oy}`;
-      img.style.transform = 'scale(2)';
-    }
+  if (now - lastTap < DOUBLE_TAP_MS) {
+    e.preventDefault();
+    toggleZoom();
   }
-  lbLastTap = now;
-}, { passive: true });
+  lastTap = now;
+});
 
 async function shareImage(url) {
   if (isTgWebApp) {
@@ -659,7 +666,7 @@ function toast(msg) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=20', { scope: './' });
+  navigator.serviceWorker.register('./sw.js?v=23', { scope: './' });
 }
 </script>
 </body>
