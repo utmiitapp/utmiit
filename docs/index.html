@@ -641,7 +641,6 @@ function resetLightbox() {
 }
 
 function openLightbox(src) {
-  if (isTgWebApp && tg.openLink) { tg.openLink(src); return; }
   lightboxImg.src = src;
   lightboxEl.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -710,9 +709,8 @@ lightboxImg.addEventListener('dblclick', e => {
   lbZoom > 1 ? setZoom(1) : setZoom(2.5, e.clientX, e.clientY);
 });
 
-/* Touch: pinch-to-zoom + pan + double-tap */
-const DOUBLE_TAP_MS = 280;
-let lastTap = 0, pinching = false, pinchStartDist = 0, pinchStartZoom = 1;
+/* Touch: pinch-to-zoom (2 fingers) + pan (1 finger when zoomed) */
+let pinching = false, pinchStartDist = 0, pinchStartZoom = 1;
 let touchPanning = false, tpStartX = 0, tpStartY = 0, tpStartPanX = 0, tpStartPanY = 0;
 
 function touchDist(a, b) { return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); }
@@ -748,16 +746,6 @@ lightboxEl.addEventListener('touchend', e => {
   if (pinching && e.touches.length < 2) pinching = false;
   if (e.touches.length === 0) touchPanning = false;
 }, { passive: true });
-
-lightboxImg.addEventListener('touchend', e => {
-  if (pinching) return;
-  const now = Date.now();
-  if (now - lastTap < DOUBLE_TAP_MS) {
-    e.preventDefault();
-    lbZoom > 1 ? setZoom(1) : setZoom(2.5, e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-  }
-  lastTap = now;
-});
 
 async function shareImage(url) {
   if (isTgWebApp) {
