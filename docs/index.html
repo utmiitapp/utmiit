@@ -31,7 +31,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: pan-x pan-y pinch-zoom; }
     ::-webkit-scrollbar { display: none; }
     body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; overscroll-behavior: none; transition: background .2s, color .2s; }
-    #app { max-width: 520px; margin: 0 auto; padding: 0 14px 90px; }
+    #app { max-width: 520px; margin: 0 auto; padding: 0 10px 90px; }
 
     .card { background: var(--surf); border-radius: 18px; box-shadow: var(--shad); overflow: hidden; }
     .row  { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; }
@@ -86,8 +86,18 @@
     .empty-s { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 40px 0; color: var(--sub); font-weight: 700; font-size: 15px; }
     .empty-s svg { width: 52px; height: 52px; opacity: .35; }
     .err-box { background: rgba(255,59,48,.1); border: 1px solid rgba(255,59,48,.25); border-radius: 12px; padding: 12px; color: var(--danger); font-weight: 700; font-size: 14px; text-align: center; }
-    #pages .img-wrap { position: relative; margin-bottom: 10px; }
-    #pages img { width: 100%; border-radius: 10px; display: block; cursor: zoom-in; transition: opacity .15s; }
+    #pages .img-wrap { position: relative; margin-bottom: 0; }
+    #pages .img-wrap + .img-wrap { margin-top: 8px; }
+    #pages img {
+      width: 100%;
+      display: block;
+      cursor: zoom-in;
+      transition: opacity .15s;
+      image-rendering: -webkit-optimize-contrast;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transform: translateZ(0);
+    }
     #pages img:active { opacity: .85; }
     .img-share {
       position: absolute;
@@ -112,7 +122,7 @@
     #lightbox.open { display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     #lightbox-inner { position: relative; transition: transform .15s ease; pointer-events: none; }
-    #lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; display: block; pointer-events: auto; cursor: grab; user-select: none; -webkit-user-drag: none; }
+    #lightbox img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 4px; display: block; pointer-events: auto; cursor: grab; user-select: none; -webkit-user-drag: none; image-rendering: -webkit-optimize-contrast; }
     #lightbox img:active { cursor: grabbing; }
     #lightbox-tools { position: fixed; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; z-index: 510; }
     .lb-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15); background: rgba(30,30,30,.85); color: #fff; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(0,0,0,.4); cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform .12s, background .15s; }
@@ -186,23 +196,23 @@
       <button class="dbn" data-day="saturday"  onclick="selectDay('saturday')"> <span>Сб</span><span class="dot"></span></button>
     </div>
 
-    <div class="card" style="margin-bottom:14px;">
-      <div id="img-area" style="padding:12px;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-        <div class="empty-s" id="st-empty">
+    <div class="card" style="margin-bottom:14px;overflow:hidden;">
+      <div id="img-area" style="padding:0;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div class="empty-s" id="st-empty" style="padding:40px 20px;">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.3"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>
           <span>Выберите день</span>
         </div>
-        <div class="skel" id="st-skel" style="width:100%;height:320px;display:none;"></div>
-        <div id="st-prog" style="display:none;width:100%;">
-          <div class="skel" style="width:100%;height:280px;"></div>
+        <div class="skel" id="st-skel" style="width:100%;height:400px;display:none;border-radius:0;"></div>
+        <div id="st-prog" style="display:none;width:100%;padding:12px;">
+          <div class="skel" style="width:100%;height:360px;border-radius:10px;"></div>
           <div class="prog-bg"><div class="prog-fill" id="prog-fill"></div></div>
           <div id="prog-txt" style="font-size:11px;font-weight:700;color:var(--sub);text-align:center;margin-top:5px;"></div>
         </div>
-        <div id="st-err" style="display:none;width:100%;">
+        <div id="st-err" style="display:none;width:100%;padding:12px;">
           <div class="err-box" id="err-msg">Ошибка</div>
           <button class="sbtn" onclick="retryLoad()">↺ Повторить</button>
         </div>
-        <div id="pages" style="display:none;width:100%;"></div>
+        <div id="pages" style="display:none;width:100%;padding:0;"></div>
       </div>
       <a id="dlnk" class="dlnk" href="#" target="_blank">Открыть в Google Drive</a>
     </div>
@@ -407,6 +417,14 @@ async function loadSchedule(d, silent = false) {
       const img = new Image();
       img.src = `${STATIC_BASE}/${d}/page-${i+1}.${ext}?v=${encodeURIComponent(cacheKey)}`;
       img.loading = 'lazy';
+      img.decoding = 'async';
+      img.setAttribute('fetchpriority', 'high');
+      img.style.width = '100%';
+      img.style.display = 'block';
+      // Single page: flush with card edges; multiple pages: rounded
+      img.style.borderRadius = data.pages === 1 ? '18px' : '0';
+      if (data.pages > 1 && (i === 0)) img.style.borderRadius = '18px 18px 0 0';
+      if (data.pages > 1 && (i === data.pages - 1)) img.style.borderRadius = '0 0 18px 18px';
       img.onerror = () => {
         if (img.dataset.fallback) return;
         img.dataset.fallback = '1';
