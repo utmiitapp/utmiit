@@ -2,7 +2,7 @@
 <html lang="ru" data-theme="light">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Расписание</title>
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -32,10 +32,6 @@
     ::-webkit-scrollbar { display: none; }
     body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; overscroll-behavior: none; transition: background .2s, color .2s; }
     #app { max-width: 520px; margin: 0 auto; padding: 0 14px 90px; }
-    #page-schedule { margin-left: -14px; margin-right: -14px; padding-left: 14px; padding-right: 14px; }
-    #schedule-img-card { margin-left: -14px !important; margin-right: -14px !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important; }
-    #page-schedule #img-area { padding: 0 !important; }
-    #pages { width: 100%; padding: 0; }
 
     .card { background: var(--surf); border-radius: 18px; box-shadow: var(--shad); overflow: hidden; }
     .row  { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; }
@@ -90,10 +86,48 @@
     .empty-s { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 40px 0; color: var(--sub); font-weight: 700; font-size: 15px; }
     .empty-s svg { width: 52px; height: 52px; opacity: .35; }
     .err-box { background: rgba(255,59,48,.1); border: 1px solid rgba(255,59,48,.25); border-radius: 12px; padding: 12px; color: var(--danger); font-weight: 700; font-size: 14px; text-align: center; }
-    #pages .img-wrap { position: relative; margin-bottom: 2px; }
-    #pages .img-wrap:last-child { margin-bottom: 0; }
-    #pages img { width: 100%; display: block; cursor: zoom-in; transition: opacity .15s; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; border-radius: 0; }
-    #pages img:active { opacity: .85; }
+
+    /* карточка с расписанием — без паддингов, шире экрана */
+    #schedule-card {
+      margin-left: -14px;
+      margin-right: -14px;
+      border-radius: 16px;
+    }
+    #img-area { padding: 0; min-height: 160px; }
+    #st-empty { padding: 40px 14px; }
+    #st-skel, #st-prog, #st-err { padding: 12px 14px; }
+
+    #pages {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #pages::-webkit-scrollbar { display: none; }
+
+    #pages-inner { min-width: 200vw; }
+    #pages-inner .img-wrap { position: relative; margin-bottom: 2px; }
+    #pages-inner .img-wrap:last-child { margin-bottom: 0; }
+    #pages-inner img {
+      width: 100%;
+      display: block;
+      cursor: zoom-in;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+
+    #scroll-hint {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 14px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--sub);
+      background: var(--surf);
+      border-bottom: 1px solid var(--brd);
+    }
+    #scroll-hint.show { display: flex; }
     .img-share {
       position: absolute;
       bottom: 8px;
@@ -126,7 +160,7 @@
     #lb-zoom-label { position: fixed; left: 12px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); font-size: 13px; font-weight: 800; color: rgba(255,255,255,.7); z-index: 510; pointer-events: none; font-family: 'Nunito', sans-serif; transition: opacity .2s; }
     .prog-bg { width: 100%; height: 4px; background: var(--surf2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
     .prog-fill { height: 4px; background: var(--acc); border-radius: 4px; width: 0; transition: width .2s; }
-    .dlnk { display: none; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; color: var(--acc); text-decoration: none; border-top: 1px solid var(--brd); background: var(--surf); }
+    .dlnk { display: none; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; color: var(--acc); text-decoration: none; border-top: 1px solid var(--brd); }
 
     .pills { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
     .pills::-webkit-scrollbar { display: none; }
@@ -191,19 +225,20 @@
       <button class="dbn" data-day="saturday"  onclick="selectDay('saturday')"> <span>Сб</span><span class="dot"></span></button>
     </div>
 
-    <div class="card" id="schedule-img-card" style="margin-bottom:14px;">
-      <div id="img-area" style="padding:0;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-        <div class="empty-s" id="st-empty" style="padding: 40px 20px;">
+    <div class="card" id="schedule-card" style="margin-bottom:14px;">
+      <div id="scroll-hint">← прокрути →</div>
+      <div id="img-area" style="min-height:200px;">
+        <div class="empty-s" id="st-empty">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.3"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>
           <span>Выберите день</span>
         </div>
-        <div class="skel" id="st-skel" style="width:100%;height:320px;border-radius:10px;display:none;"></div>
-        <div id="st-prog" style="display:none;width:100%;padding:12px;">
+        <div class="skel" id="st-skel" style="width:100%;height:320px;display:none;"></div>
+        <div id="st-prog" style="display:none;width:100%;">
           <div class="skel" style="width:100%;height:280px;"></div>
           <div class="prog-bg"><div class="prog-fill" id="prog-fill"></div></div>
           <div id="prog-txt" style="font-size:11px;font-weight:700;color:var(--sub);text-align:center;margin-top:5px;"></div>
         </div>
-        <div id="st-err" style="display:none;width:100%;padding:12px;">
+        <div id="st-err" style="display:none;width:100%;">
           <div class="err-box" id="err-msg">Ошибка</div>
           <button class="sbtn" onclick="retryLoad()">↺ Повторить</button>
         </div>
@@ -404,8 +439,14 @@ async function loadSchedule(d, silent = false) {
     const cacheKey = data.updated_at || data.hash || Date.now();
 
     if (data.pages > 1 && !silent) showSt('prog');
+
     const box = document.getElementById('pages');
     box.innerHTML = '';
+
+    const inner = document.createElement('div');
+    inner.id = 'pages-inner';
+    box.appendChild(inner);
+
     const ext = data.ext || 'png';
     const altExt = ext === 'jpg' ? 'png' : 'jpg';
     for (let i = 0; i < data.pages; i++) {
@@ -413,8 +454,6 @@ async function loadSchedule(d, silent = false) {
       img.src = `${STATIC_BASE}/${d}/page-${i+1}.${ext}?v=${encodeURIComponent(cacheKey)}`;
       img.loading = 'eager';
       img.decoding = 'async';
-      img.style.width = '100%';
-      img.style.display = 'block';
       img.onerror = () => {
         if (img.dataset.fallback) return;
         img.dataset.fallback = '1';
@@ -439,7 +478,7 @@ async function loadSchedule(d, silent = false) {
       };
       wrap.appendChild(shareBtn);
 
-      box.appendChild(wrap);
+      inner.appendChild(wrap);
       document.getElementById('prog-fill').style.width = Math.round((i+1)/data.pages*100) + '%';
       document.getElementById('prog-txt').textContent  = `Страница ${i+1} из ${data.pages}`;
     }
@@ -448,6 +487,13 @@ async function loadSchedule(d, silent = false) {
     refreshTs = Date.now();
     document.getElementById('dlnk').style.display = 'block';
     document.getElementById('dlnk').href = data.link || '#';
+
+    // подсказка скролла — убирается после свайпа или через 4 сек
+    const hint = document.getElementById('scroll-hint');
+    hint.classList.add('show');
+    const hideHint = () => { hint.classList.remove('show'); box.removeEventListener('scroll', hideHint); };
+    box.addEventListener('scroll', hideHint, { passive: true });
+    setTimeout(() => hint.classList.remove('show'), 4000);
   } catch (e) {
     if (!silent) showSt('err', 'Не удалось загрузить расписание: ' + e.message);
   }
