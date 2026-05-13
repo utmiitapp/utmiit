@@ -121,24 +121,18 @@
     #pages-inner .img-wrap:last-child { margin-bottom: 0; }
     #pages-inner img { width: 100%; height: auto; display: block; cursor: zoom-in; }
 
-    /* на десктопе карточка шире */
-    @media (min-width: 700px) {
-      #schedule-card {
-        margin-left: calc(-1 * (min(100vw, 900px) - 520px) / 2 - 14px);
-        margin-right: calc(-1 * (min(100vw, 900px) - 520px) / 2 - 14px);
-      }
-      #pages { border-radius: 0 0 16px 16px; }
-    }
-    @media (min-width: 960px) {
-      #schedule-card {
-        margin-left: calc(-220px);
-        margin-right: calc(-220px);
-      }
-    }
+    /* на десктопе ширина управляется из JS через setCardZoom */
 
-    #zoom-bar { display: none; align-items: center; justify-content: space-between; padding: 8px 12px; border-top: 1px solid var(--brd); background: var(--surf); }
+    #zoom-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--brd);
+      background: var(--surf);
+      border-radius: 16px 16px 0 0;
+    }
     #zoom-bar.show { display: flex; }
-    #zoom-bar:last-child { border-radius: 0 0 16px 16px; }
     .dlnk { display: none; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; color: var(--acc); text-decoration: none; border-top: 1px solid var(--brd); background: var(--surf); border-radius: 0 0 16px 16px; }
     .zbar-left { display: flex; align-items: center; gap: 6px; }
     .zbtn { width: 32px; height: 32px; border-radius: 9px; border: none; background: var(--surf2); color: var(--text); font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .12s, transform .1s; flex-shrink: 0; line-height: 1; }
@@ -228,6 +222,18 @@
     </div>
 
     <div id="schedule-card">
+      <div id="zoom-bar">
+        <div class="zbar-left">
+          <button class="zbtn" id="zbtn-out">−</button>
+          <span id="zoom-pct">100%</span>
+          <button class="zbtn" id="zbtn-in">+</button>
+          <button id="zoom-reset">сброс</button>
+        </div>
+        <button id="zoom-fs">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          На весь экран
+        </button>
+      </div>
       <div id="img-area" style="min-height:200px;">
         <div class="empty-s" id="st-empty">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.3"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>
@@ -244,18 +250,6 @@
           <button class="sbtn" onclick="retryLoad()">↺ Повторить</button>
         </div>
         <div id="pages" style="display:none;"></div>
-      </div>
-      <div id="zoom-bar">
-        <div class="zbar-left">
-          <button class="zbtn" id="zbtn-out">−</button>
-          <span id="zoom-pct">100%</span>
-          <button class="zbtn" id="zbtn-in">+</button>
-          <button id="zoom-reset">сброс</button>
-        </div>
-        <button id="zoom-fs">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-          На весь экран
-        </button>
       </div>
       <a id="dlnk" class="dlnk" href="#" target="_blank">Открыть в Google Drive</a>
     </div>
@@ -493,9 +487,7 @@ async function loadSchedule(d, silent = false) {
     showSt('pages');
     refreshTs = Date.now();
     // ставим начальный зум под текущую ширину карточки
-    cardZoom = getZoomDefault();
-    inner.style.width = cardZoom + 'px';
-    document.getElementById('zoom-pct').textContent = '100%';
+    setCardZoom(getZoomDefault());
     document.getElementById('dlnk').style.display = 'block';
     document.getElementById('dlnk').href = data.link || '#';
     document.getElementById('zoom-bar').classList.add('show');
@@ -805,19 +797,27 @@ const ZOOM_MIN  = 500;
 const ZOOM_MAX  = 2000;
 // на ПК берём ширину карточки, на мобиле — 900px чтобы всё влезло
 function getZoomDefault() {
-  const card = document.getElementById('schedule-card');
-  if (card) {
-    const w = card.offsetWidth;
-    if (w > 600) return w; // ПК: заполняем карточку
-  }
-  return 900; // мобил
+  // на широком экране — 900px, на мобиле — ширина экрана
+  const vw = window.innerWidth;
+  if (vw >= 700) return Math.min(1100, vw - 80);
+  return Math.max(600, vw - 28); // мобил: почти весь экран
 }
 let cardZoom = 900;
 
 function setCardZoom(w) {
   const def = getZoomDefault();
   cardZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, w));
+
+  // двигаем и карточку, и inner одновременно — окно растёт вместе с картинкой
+  const card = document.getElementById('schedule-card');
   const inner = document.getElementById('pages-inner');
+  const appW = 520; // базовая ширина #app
+  const extraEachSide = Math.max(0, (cardZoom - appW) / 2);
+
+  if (card) {
+    card.style.marginLeft = (-14 - extraEachSide) + 'px';
+    card.style.marginRight = (-14 - extraEachSide) + 'px';
+  }
   if (inner) inner.style.width = cardZoom + 'px';
   document.getElementById('zoom-pct').textContent = Math.round(cardZoom / def * 100) + '%';
 }
