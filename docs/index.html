@@ -87,7 +87,6 @@
     .empty-s svg { width: 52px; height: 52px; opacity: .35; }
     .err-box { background: rgba(255,59,48,.1); border: 1px solid rgba(255,59,48,.25); border-radius: 12px; padding: 12px; color: var(--danger); font-weight: 700; font-size: 14px; text-align: center; }
 
-    /* карточка с расписанием — без паддингов, шире экрана */
     #schedule-card {
       margin-left: -14px;
       margin-right: -14px;
@@ -105,7 +104,6 @@
     }
     #pages::-webkit-scrollbar { display: none; }
 
-    /* Ширина = ~900px чтобы текст в таблице читался без зума, при этом скролл горизонтальный */
     #pages-inner { width: 900px; }
     #pages-inner .img-wrap { position: relative; margin-bottom: 2px; }
     #pages-inner .img-wrap:last-child { margin-bottom: 0; }
@@ -131,7 +129,6 @@
     }
     #scroll-hint.show { display: flex; }
 
-    /* Зум-бар под изображением */
     #zoom-bar {
       display: none;
       align-items: center;
@@ -181,8 +178,7 @@
 
     #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; overflow: hidden; cursor: zoom-out; touch-action: none; }
     #lightbox.open { display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    #lightbox-inner { position: relative; transition: transform .15s ease; pointer-events: none; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }    #lightbox-inner { position: relative; transition: transform .15s ease; pointer-events: none; }
     #lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; display: block; pointer-events: auto; cursor: grab; user-select: none; -webkit-user-drag: none; }
     #lightbox img:active { cursor: grabbing; }
     #lightbox-tools { position: fixed; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; z-index: 510; }
@@ -535,7 +531,6 @@ async function loadSchedule(d, silent = false) {
     document.getElementById('dlnk').href = data.link || '#';
     document.getElementById('zoom-bar').classList.add('show');
 
-    // подсказка скролла — убирается после свайпа или через 4 сек
     const hint = document.getElementById('scroll-hint');
     hint.classList.add('show');
     const hideHint = () => { hint.classList.remove('show'); box.removeEventListener('scroll', hideHint); };
@@ -573,7 +568,6 @@ function showSt(st, msg) {
   if (msg) document.getElementById('err-msg').textContent = '⚠️ ' + msg;
 }
 
-// Pull-to-refresh
 let ptr_startY = 0, ptr_pulling = false;
 const PTR_THRESHOLD = 70;
 
@@ -757,16 +751,13 @@ function closeLightbox() {
   resetLightbox();
 }
 
-/* Click backdrop (outside image) to close */
 lightboxEl.addEventListener('click', e => {
   if (lbDidDrag) { lbDidDrag = false; return; }
   if (e.target === lightboxEl || e.target === lightboxInner) closeLightbox();
 });
 
-/* Close button */
 document.getElementById('lb-close').addEventListener('click', e => { e.stopPropagation(); closeLightbox(); });
 
-/* Zoom buttons */
 document.getElementById('lb-zin').addEventListener('click', e => {
   e.stopPropagation();
   const r = lightboxEl.getBoundingClientRect();
@@ -778,19 +769,16 @@ document.getElementById('lb-zout').addEventListener('click', e => {
   setZoom(lbZoom - 0.5, r.left + r.width / 2, r.top + r.height / 2);
 });
 
-/* Mouse wheel zoom — centered on cursor */
 lightboxEl.addEventListener('wheel', e => {
   e.preventDefault();
   const delta = e.deltaY > 0 ? -0.25 : 0.25;
   setZoom(lbZoom + delta, e.clientX, e.clientY);
 }, { passive: false });
 
-/* Escape key to close */
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && lightboxEl.classList.contains('open')) closeLightbox();
 });
 
-/* Mouse drag to pan when zoomed */
 lightboxImg.addEventListener('mousedown', e => {
   if (lbZoom <= 1) return;
   e.preventDefault();
@@ -807,13 +795,11 @@ document.addEventListener('mousemove', e => {
 });
 document.addEventListener('mouseup', () => { lbDragging = false; });
 
-/* Double-click to toggle zoom */
 lightboxImg.addEventListener('dblclick', e => {
   e.preventDefault(); e.stopPropagation();
   lbZoom > 1 ? setZoom(1) : setZoom(2.5, e.clientX, e.clientY);
 });
 
-/* Touch: pinch-to-zoom (2 fingers) + pan (1 finger when zoomed) */
 let pinching = false, pinchStartDist = 0, pinchStartZoom = 1;
 let touchPanning = false, tpStartX = 0, tpStartY = 0, tpStartPanX = 0, tpStartPanY = 0;
 
@@ -851,11 +837,10 @@ lightboxEl.addEventListener('touchend', e => {
   if (e.touches.length === 0) touchPanning = false;
 }, { passive: true });
 
-// ── Зум прямо в карточке ──
-const ZOOM_BASE = 900; // px — базовая ширина
+const ZOOM_BASE = 900;
 const ZOOM_STEP = 150;
-const ZOOM_MIN  = 600;
-const ZOOM_MAX  = 1800;
+const ZOOM_MIN = 600;
+const ZOOM_MAX = 1800;
 let cardZoom = ZOOM_BASE;
 
 function setCardZoom(w) {
