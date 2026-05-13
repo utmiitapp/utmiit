@@ -100,8 +100,8 @@
 
     .card { background: var(--surf); border-radius: 18px; box-shadow: var(--shad); overflow: hidden; }
 
-    #schedule-card { border-radius: 16px; }
-    #img-area { padding: 0; min-height: 160px; }
+    #schedule-card { border-radius: 16px; overflow: visible; box-shadow: var(--shad); }
+    #img-area { padding: 0; min-height: 160px; overflow: hidden; background: var(--surf); border-radius: 16px 16px 0 0; }
     #st-empty { padding: 40px 14px; }
     #st-skel, #st-prog, #st-err { padding: 12px 14px; }
 
@@ -114,6 +114,8 @@
 
     #zoom-bar { display: none; align-items: center; justify-content: space-between; padding: 8px 12px; border-top: 1px solid var(--brd); background: var(--surf); }
     #zoom-bar.show { display: flex; }
+    #zoom-bar:last-child { border-radius: 0 0 16px 16px; }
+    .dlnk { display: none; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; color: var(--acc); text-decoration: none; border-top: 1px solid var(--brd); background: var(--surf); border-radius: 0 0 16px 16px; }
     .zbar-left { display: flex; align-items: center; gap: 6px; }
     .zbtn { width: 32px; height: 32px; border-radius: 9px; border: none; background: var(--surf2); color: var(--text); font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .12s, transform .1s; flex-shrink: 0; line-height: 1; }
     .zbtn:active { transform: scale(.87); background: var(--acc); color: #fff; }
@@ -137,7 +139,6 @@
     #lb-zoom-label { position: fixed; left: 12px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); font-size: 13px; font-weight: 800; color: rgba(255,255,255,.7); z-index: 510; pointer-events: none; font-family: 'Nunito', sans-serif; transition: opacity .2s; }
     .prog-bg { width: 100%; height: 4px; background: var(--surf2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
     .prog-fill { height: 4px; background: var(--acc); border-radius: 4px; width: 0; transition: width .2s; }
-    .dlnk { display: none; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; color: var(--acc); text-decoration: none; border-top: 1px solid var(--brd); }
 
     .pills { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
     .pills::-webkit-scrollbar { display: none; }
@@ -433,7 +434,7 @@ async function loadSchedule(d, silent = false) {
 
     const inner = document.createElement('div');
     inner.id = 'pages-inner';
-    inner.style.width = '100%';
+    inner.style.width = ZOOM_DEFAULT + 'px';
     box.appendChild(inner);
 
     const ext = data.ext || 'png';
@@ -467,7 +468,7 @@ async function loadSchedule(d, silent = false) {
 
     showSt('pages');
     refreshTs = Date.now();
-    cardZoom = 0;
+    cardZoom = ZOOM_DEFAULT;
     document.getElementById('zoom-pct').textContent = '100%';
     document.getElementById('dlnk').style.display = 'block';
     document.getElementById('dlnk').href = data.link || '#';
@@ -773,40 +774,22 @@ lightboxEl.addEventListener('touchend', e => {
   if (e.touches.length === 0) touchPanning = false;
 }, { passive: true });
 
-const ZOOM_STEP = 150;
-const ZOOM_MIN  = 400;
-const ZOOM_MAX  = 1800;
-let cardZoom = 0; // 0 = auto (100% of container)
-
-function getZoomBase() {
-  return document.getElementById('pages')?.offsetWidth || 500;
-}
+const ZOOM_STEP = 200;
+const ZOOM_MIN  = 500;
+const ZOOM_MAX  = 2000;
+const ZOOM_DEFAULT = 900;
+let cardZoom = ZOOM_DEFAULT;
 
 function setCardZoom(w) {
-  const base = getZoomBase();
-  if (w === 0) {
-    cardZoom = 0;
-    const inner = document.getElementById('pages-inner');
-    if (inner) inner.style.width = '100%';
-    document.getElementById('zoom-pct').textContent = '100%';
-    return;
-  }
   cardZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, w));
   const inner = document.getElementById('pages-inner');
   if (inner) inner.style.width = cardZoom + 'px';
-  document.getElementById('zoom-pct').textContent = Math.round(cardZoom / base * 100) + '%';
+  document.getElementById('zoom-pct').textContent = Math.round(cardZoom / ZOOM_DEFAULT * 100) + '%';
 }
 
-document.getElementById('zbtn-in').addEventListener('click', () => {
-  const base = cardZoom || getZoomBase();
-  setCardZoom(base + ZOOM_STEP);
-});
-document.getElementById('zbtn-out').addEventListener('click', () => {
-  const base = cardZoom || getZoomBase();
-  const next = base - ZOOM_STEP;
-  next <= getZoomBase() ? setCardZoom(0) : setCardZoom(next);
-});
-document.getElementById('zoom-reset').addEventListener('click', () => setCardZoom(0));
+document.getElementById('zbtn-in').addEventListener('click', () => setCardZoom(cardZoom + ZOOM_STEP));
+document.getElementById('zbtn-out').addEventListener('click', () => setCardZoom(cardZoom - ZOOM_STEP));
+document.getElementById('zoom-reset').addEventListener('click', () => setCardZoom(ZOOM_DEFAULT));
 document.getElementById('zoom-fs').addEventListener('click', () => {
   const src = document.querySelector('#pages-inner img')?.src;
   if (src) openLightbox(src);
