@@ -458,7 +458,7 @@ async function loadSchedule(d, silent = false) {
 
     const inner = document.createElement('div');
     inner.id = 'pages-inner';
-    inner.style.width = ZOOM_DEFAULT + 'px';
+    // ширина ставится позже в loadSchedule после showSt
     box.appendChild(inner);
 
     const ext = data.ext || 'png';
@@ -824,7 +824,7 @@ function setCardZoom(w) {
 
 document.getElementById('zbtn-in').addEventListener('click', () => setCardZoom(cardZoom + ZOOM_STEP));
 document.getElementById('zbtn-out').addEventListener('click', () => setCardZoom(cardZoom - ZOOM_STEP));
-document.getElementById('zoom-reset').addEventListener('click', () => setCardZoom(ZOOM_DEFAULT));
+document.getElementById('zoom-reset').addEventListener('click', () => setCardZoom(getZoomDefault()));
 document.getElementById('zoom-fs').addEventListener('click', () => {
   const src = document.querySelector('#pages-inner img')?.src;
   if (src) openLightbox(src);
