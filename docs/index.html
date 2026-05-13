@@ -33,7 +33,12 @@
     body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; overscroll-behavior: none; transition: background .2s, color .2s; }
     #app { max-width: 520px; margin: 0 auto; padding: 0 14px 90px; }
 
-    #schedule-card { margin-left: -14px; margin-right: -14px; border-radius: 18px; }
+    #schedule-card {
+      width: 100vw;
+      margin-left: calc(-1 * (100vw - 100%) / 2 - 14px);
+      border-radius: 0;
+      overflow: visible;
+    }
     #img-area { padding: 0; min-height: 160px; }
     #st-empty { padding: 40px 14px; }
     #st-skel, #st-prog, #st-err { padding: 12px 14px; }
