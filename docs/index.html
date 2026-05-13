@@ -33,7 +33,21 @@
     body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; overscroll-behavior: none; transition: background .2s, color .2s; }
     #app { max-width: 520px; margin: 0 auto; padding: 0 14px 90px; }
 
-    .card { background: var(--surf); border-radius: 18px; box-shadow: var(--shad); overflow: hidden; }
+    #schedule-card { margin-left: -14px; margin-right: -14px; border-radius: 18px; }
+    #img-area { padding: 0; min-height: 160px; }
+    #st-empty { padding: 40px 14px; }
+    #st-skel, #st-prog, #st-err { padding: 12px 14px; }
+
+    #pages { width: 100%; }
+    #pages .img-wrap { position: relative; margin-bottom: 2px; }
+    #pages .img-wrap:last-child { margin-bottom: 0; }
+    #pages img {
+      width: 100%;
+      display: block;
+      cursor: zoom-in;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
     .row  { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; }
     .row:not(:last-child) { border-bottom: 1px solid var(--brd); }
     .row:active { opacity: .6; }
@@ -87,94 +101,7 @@
     .empty-s svg { width: 52px; height: 52px; opacity: .35; }
     .err-box { background: rgba(255,59,48,.1); border: 1px solid rgba(255,59,48,.25); border-radius: 12px; padding: 12px; color: var(--danger); font-weight: 700; font-size: 14px; text-align: center; }
 
-    #schedule-card {
-      margin-left: -14px;
-      margin-right: -14px;
-      border-radius: 16px;
-    }
-    #img-area { padding: 0; min-height: 160px; }
-    #st-empty { padding: 40px 14px; }
-    #st-skel, #st-prog, #st-err { padding: 12px 14px; }
-
-    #pages {
-      width: 100%;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-    #pages::-webkit-scrollbar { display: none; }
-
-    #pages-inner { width: 900px; }
-    #pages-inner .img-wrap { position: relative; margin-bottom: 2px; }
-    #pages-inner .img-wrap:last-child { margin-bottom: 0; }
-    #pages-inner img {
-      width: 100%;
-      display: block;
-      cursor: zoom-in;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
-    }
-
-    #scroll-hint {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 7px 14px;
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--sub);
-      background: var(--surf);
-      border-bottom: 1px solid var(--brd);
-    }
-    #scroll-hint.show { display: flex; }
-
-    #zoom-bar {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 12px;
-      border-top: 1px solid var(--brd);
-      background: var(--surf);
-    }
-    #zoom-bar.show { display: flex; }
-    .zbar-left { display: flex; align-items: center; gap: 6px; }
-    .zbtn {
-      width: 32px; height: 32px; border-radius: 9px;
-      border: none; background: var(--surf2);
-      color: var(--text); font-size: 18px; font-weight: 900;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: background .12s, transform .1s;
-      flex-shrink: 0; line-height: 1;
-    }
-    .zbtn:active { transform: scale(.87); background: var(--acc); color: #fff; }
-    #zoom-pct { font-size: 12px; font-weight: 800; color: var(--sub); min-width: 40px; text-align: center; }
-    #zoom-reset { font-size: 12px; font-weight: 800; color: var(--acc); background: none; border: none; cursor: pointer; padding: 0 4px; font-family: 'Nunito', sans-serif; }
-    #zoom-fs {
-      display: flex; align-items: center; gap: 4px;
-      font-size: 12px; font-weight: 800; color: var(--acc);
-      background: none; border: none; cursor: pointer;
-      font-family: 'Nunito', sans-serif; padding: 0;
-    }
-    #zoom-fs svg { width: 14px; height: 14px; }
-    .img-share {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      border: 1px solid var(--brd);
-      background: var(--surf);
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: var(--shad);
-    }
-    .img-share svg { width: 18px; height: 18px; }
-    .img-share:active { transform: scale(.92); }
+    .card { background: var(--surf); border-radius: 18px; box-shadow: var(--shad); overflow: hidden; }
 
     #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; overflow: hidden; cursor: zoom-out; touch-action: none; }
     #lightbox.open { display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
@@ -254,9 +181,6 @@
     </div>
 
     <div class="card" id="schedule-card" style="margin-bottom:14px;">
-      <div id="scroll-hint">
-        <span>← прокрути чтобы читать →</span>
-      </div>
       <div id="img-area" style="min-height:200px;">
         <div class="empty-s" id="st-empty">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.3"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>
@@ -273,18 +197,6 @@
           <button class="sbtn" onclick="retryLoad()">↺ Повторить</button>
         </div>
         <div id="pages" style="display:none;width:100%;"></div>
-      </div>
-      <div id="zoom-bar">
-        <div class="zbar-left">
-          <button class="zbtn" id="zbtn-out">−</button>
-          <span id="zoom-pct">100%</span>
-          <button class="zbtn" id="zbtn-in">+</button>
-          <button id="zoom-reset">сброс</button>
-        </div>
-        <button id="zoom-fs">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-          На весь экран
-        </button>
       </div>
       <a id="dlnk" class="dlnk" href="#" target="_blank">Открыть в Google Drive</a>
     </div>
@@ -485,10 +397,6 @@ async function loadSchedule(d, silent = false) {
     const box = document.getElementById('pages');
     box.innerHTML = '';
 
-    const inner = document.createElement('div');
-    inner.id = 'pages-inner';
-    box.appendChild(inner);
-
     const ext = data.ext || 'png';
     const altExt = ext === 'jpg' ? 'png' : 'jpg';
     for (let i = 0; i < data.pages; i++) {
@@ -505,22 +413,7 @@ async function loadSchedule(d, silent = false) {
       const wrap = document.createElement('div');
       wrap.className = 'img-wrap';
       wrap.appendChild(img);
-
-      const shareBtn = document.createElement('button');
-      shareBtn.type = 'button';
-      shareBtn.className = 'img-share';
-      shareBtn.innerHTML = `<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M7 17L17 7"/>
-        <path d="M10 7h7v7"/>
-      </svg>`;
-      shareBtn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        shareImage(img.src);
-      };
-      wrap.appendChild(shareBtn);
-
-      inner.appendChild(wrap);
+      box.appendChild(wrap);
       document.getElementById('prog-fill').style.width = Math.round((i+1)/data.pages*100) + '%';
       document.getElementById('prog-txt').textContent  = `Страница ${i+1} из ${data.pages}`;
     }
@@ -529,13 +422,6 @@ async function loadSchedule(d, silent = false) {
     refreshTs = Date.now();
     document.getElementById('dlnk').style.display = 'block';
     document.getElementById('dlnk').href = data.link || '#';
-    document.getElementById('zoom-bar').classList.add('show');
-
-    const hint = document.getElementById('scroll-hint');
-    hint.classList.add('show');
-    const hideHint = () => { hint.classList.remove('show'); box.removeEventListener('scroll', hideHint); };
-    box.addEventListener('scroll', hideHint, { passive: true });
-    setTimeout(() => hint.classList.remove('show'), 4000);
   } catch (e) {
     if (!silent) showSt('err', 'Не удалось загрузить расписание: ' + e.message);
   }
@@ -561,10 +447,7 @@ function showSt(st, msg) {
   document.getElementById('st-prog') .style.display = st==='prog'  ? 'block' : 'none';
   document.getElementById('st-err')  .style.display = st==='err'   ? 'block' : 'none';
   document.getElementById('pages')   .style.display = st==='pages' ? 'block' : 'none';
-  if (st !== 'pages') {
-    document.getElementById('dlnk').style.display = 'none';
-    document.getElementById('zoom-bar').classList.remove('show');
-  }
+  if (st !== 'pages') document.getElementById('dlnk').style.display = 'none';
   if (msg) document.getElementById('err-msg').textContent = '⚠️ ' + msg;
 }
 
@@ -836,27 +719,6 @@ lightboxEl.addEventListener('touchend', e => {
   if (pinching && e.touches.length < 2) pinching = false;
   if (e.touches.length === 0) touchPanning = false;
 }, { passive: true });
-
-const ZOOM_BASE = 900;
-const ZOOM_STEP = 150;
-const ZOOM_MIN = 600;
-const ZOOM_MAX = 1800;
-let cardZoom = ZOOM_BASE;
-
-function setCardZoom(w) {
-  cardZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, w));
-  const inner = document.getElementById('pages-inner');
-  if (inner) inner.style.width = cardZoom + 'px';
-  document.getElementById('zoom-pct').textContent = Math.round(cardZoom / ZOOM_BASE * 100) + '%';
-}
-
-document.getElementById('zbtn-in').addEventListener('click', () => setCardZoom(cardZoom + ZOOM_STEP));
-document.getElementById('zbtn-out').addEventListener('click', () => setCardZoom(cardZoom - ZOOM_STEP));
-document.getElementById('zoom-reset').addEventListener('click', () => setCardZoom(ZOOM_BASE));
-document.getElementById('zoom-fs').addEventListener('click', () => {
-  const src = document.querySelector('#pages-inner img')?.src;
-  if (src) openLightbox(src);
-});
 
 async function shareImage(url) {
   if (isTgWebApp) {
