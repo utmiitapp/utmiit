@@ -88,30 +88,26 @@
 
     .card { background: var(--surf); border-radius: 18px; box-shadow: var(--shad); overflow: hidden; }
 
-    /* карточка расписания */
     #schedule-card {
       border-radius: 16px;
       box-shadow: var(--shad);
       background: var(--surf);
-      margin-left: -14px;
-      margin-right: -14px;
+      width: 100vw;
+      margin-left: calc(-14px - (100vw - 100%) / 2);
+      margin-right: 0;
       margin-bottom: 14px;
-      overflow: visible; /* разрешаем pages выходить за границы */
+      overflow: visible;
     }
-    #img-area { padding: 0; min-height: 160px; }
-    #st-empty { padding: 40px 14px; }
-    #st-skel, #st-prog, #st-err { padding: 12px 14px; }
 
-    /* скролл горизонтальный — сам pages скроллится */
     #pages {
       display: block;
-      width: 100%;
+      width: 100vw;
       overflow-x: auto;
       overflow-y: visible;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: thin;
       scrollbar-color: var(--surf2) transparent;
-      border-radius: 0 0 16px 16px; /* скругление снизу чтобы было красиво */
+      border-radius: 0 0 16px 16px;
     }
     #pages-inner {
       display: block;
@@ -799,12 +795,12 @@ function isMobile() { return window.innerWidth < 700; }
 
 function getZoomDefault() {
   const vw = window.innerWidth;
-  if (isMobile()) return vw - 28;
+  if (isMobile()) return vw;
   return Math.round(Math.min(1100, vw - 80) * 0.9);
 }
 
 function getZoomMin() {
-  return isMobile() ? Math.max(200, window.innerWidth - 28) : 500;
+  return isMobile() ? window.innerWidth : 500;
 }
 
 let cardZoom = 520;
@@ -816,11 +812,6 @@ function setCardZoom(w) {
 
   if (mob) {
     cardZoom = Math.min(ZOOM_MAX, Math.max(zmin, w));
-    const card = document.getElementById('schedule-card');
-    if (card) {
-      card.style.marginLeft = '-14px';
-      card.style.marginRight = '-14px';
-    }
   } else {
     cardZoom = Math.min(ZOOM_MAX, Math.max(zmin, w));
     const card = document.getElementById('schedule-card');
