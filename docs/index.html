@@ -33,18 +33,6 @@
     body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; overscroll-behavior: none; transition: background .2s, color .2s; }
     #app { max-width: 520px; margin: 0 auto; padding: 0 14px 90px; }
 
-    #schedule-card { border-radius: 16px; }
-    #img-area { padding: 0; min-height: 160px; }
-    #st-empty { padding: 40px 14px; }
-    #st-skel, #st-prog, #st-err { padding: 12px 14px; }
-
-    #pages { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-    #pages::-webkit-scrollbar { display: none; }
-    #pages-inner { min-width: 100%; }
-    #pages-inner .img-wrap { position: relative; margin-bottom: 2px; }
-    #pages-inner .img-wrap:last-child { margin-bottom: 0; }
-    #pages-inner img { width: 100%; display: block; cursor: zoom-in; image-rendering: auto; }
-
     .row  { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; }
     .row:not(:last-child) { border-bottom: 1px solid var(--brd); }
     .row:active { opacity: .6; }
@@ -100,7 +88,10 @@
 
     .card { background: var(--surf); border-radius: 18px; box-shadow: var(--shad); overflow: hidden; }
 
-    #schedule-card { border-radius: 16px; overflow: visible; box-shadow: var(--shad); }
+    #schedule-card {
+      border-radius: 16px; overflow: visible; box-shadow: var(--shad);
+      margin-left: -14px; margin-right: -14px;
+    }
     #img-area { padding: 0; min-height: 160px; overflow: hidden; background: var(--surf); border-radius: 16px 16px 0 0; }
     #st-empty { padding: 40px 14px; }
     #st-skel, #st-prog, #st-err { padding: 12px 14px; }
@@ -777,7 +768,7 @@ lightboxEl.addEventListener('touchend', e => {
 const ZOOM_STEP = 200;
 const ZOOM_MIN  = 500;
 const ZOOM_MAX  = 2000;
-const ZOOM_DEFAULT = 900;
+const ZOOM_DEFAULT = 1200;
 let cardZoom = ZOOM_DEFAULT;
 
 function setCardZoom(w) {
