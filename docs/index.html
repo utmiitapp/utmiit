@@ -793,33 +793,36 @@ lightboxEl.addEventListener('touchend', e => {
 }, { passive: true });
 
 const ZOOM_STEP = 200;
-const ZOOM_MIN  = 500;
 const ZOOM_MAX  = 2000;
-// на ПК берём ширину карточки, на мобиле — 900px чтобы всё влезло
+
 function isMobile() { return window.innerWidth < 700; }
 
 function getZoomDefault() {
   const vw = window.innerWidth;
-  if (isMobile()) return vw - 28; // мобил: ширина экрана минус паддинги карточки
-  return Math.min(1100, vw - 80); // ПК
+  if (isMobile()) return vw - 28;
+  return Math.round(Math.min(1100, vw - 80) * 0.9);
 }
+
+function getZoomMin() {
+  return isMobile() ? Math.max(200, window.innerWidth - 28) : 500;
+}
+
 let cardZoom = 520;
 
 function setCardZoom(w) {
   const def = getZoomDefault();
   const mob = isMobile();
+  const zmin = getZoomMin();
 
   if (mob) {
-    // на мобиле карточка фиксирована, только inner скроллится внутри
-    cardZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, w));
+    cardZoom = Math.min(ZOOM_MAX, Math.max(zmin, w));
     const card = document.getElementById('schedule-card');
     if (card) {
       card.style.marginLeft = '-14px';
       card.style.marginRight = '-14px';
     }
   } else {
-    // на ПК карточка и картинка растут вместе
-    cardZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, w));
+    cardZoom = Math.min(ZOOM_MAX, Math.max(zmin, w));
     const card = document.getElementById('schedule-card');
     const appW = 520;
     const extraEachSide = Math.max(0, (cardZoom - appW) / 2);
