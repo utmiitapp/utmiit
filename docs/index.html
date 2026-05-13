@@ -796,28 +796,40 @@ const ZOOM_STEP = 200;
 const ZOOM_MIN  = 500;
 const ZOOM_MAX  = 2000;
 // на ПК берём ширину карточки, на мобиле — 900px чтобы всё влезло
+function isMobile() { return window.innerWidth < 700; }
+
 function getZoomDefault() {
-  // на широком экране — 900px, на мобиле — ширина экрана
   const vw = window.innerWidth;
-  if (vw >= 700) return Math.min(1100, vw - 80);
-  return Math.max(600, vw - 28); // мобил: почти весь экран
+  if (isMobile()) return vw - 28; // мобил: ширина экрана минус паддинги карточки
+  return Math.min(1100, vw - 80); // ПК
 }
-let cardZoom = 900;
+let cardZoom = 520;
 
 function setCardZoom(w) {
   const def = getZoomDefault();
-  cardZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, w));
+  const mob = isMobile();
 
-  // двигаем и карточку, и inner одновременно — окно растёт вместе с картинкой
-  const card = document.getElementById('schedule-card');
-  const inner = document.getElementById('pages-inner');
-  const appW = 520; // базовая ширина #app
-  const extraEachSide = Math.max(0, (cardZoom - appW) / 2);
-
-  if (card) {
-    card.style.marginLeft = (-14 - extraEachSide) + 'px';
-    card.style.marginRight = (-14 - extraEachSide) + 'px';
+  if (mob) {
+    // на мобиле карточка фиксирована, только inner скроллится внутри
+    cardZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, w));
+    const card = document.getElementById('schedule-card');
+    if (card) {
+      card.style.marginLeft = '-14px';
+      card.style.marginRight = '-14px';
+    }
+  } else {
+    // на ПК карточка и картинка растут вместе
+    cardZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, w));
+    const card = document.getElementById('schedule-card');
+    const appW = 520;
+    const extraEachSide = Math.max(0, (cardZoom - appW) / 2);
+    if (card) {
+      card.style.marginLeft = (-14 - extraEachSide) + 'px';
+      card.style.marginRight = (-14 - extraEachSide) + 'px';
+    }
   }
+
+  const inner = document.getElementById('pages-inner');
   if (inner) inner.style.width = cardZoom + 'px';
   document.getElementById('zoom-pct').textContent = Math.round(cardZoom / def * 100) + '%';
 }
