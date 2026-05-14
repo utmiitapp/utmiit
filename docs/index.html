@@ -362,8 +362,6 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(checkDayChange, 60 * 1000);
 });
 
-const ua = navigator.userAgent || '';
-
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
   document.getElementById('theme-icon').innerHTML = t === 'light'
@@ -490,11 +488,6 @@ async function checkHash(d) {
   } catch (_) {}
 }
 
-function manualRefresh() {
-  if (!day) return;
-  delete hashes[day];
-  loadSchedule(day, true);
-}
 function retryLoad() { if (day) loadSchedule(day); }
 
 function showSt(st, msg) {
