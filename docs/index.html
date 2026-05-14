@@ -92,16 +92,13 @@
       border-radius: 16px;
       box-shadow: var(--shad);
       background: var(--surf);
-      width: 100vw;
-      margin-left: calc(-14px - (100vw - 100%) / 2);
-      margin-right: 0;
       margin-bottom: 14px;
       overflow: visible;
     }
 
     #pages {
       display: block;
-      width: 100vw;
+      width: 100%;
       overflow-x: auto;
       overflow-y: visible;
       -webkit-overflow-scrolling: touch;
@@ -804,17 +801,27 @@ function setCardZoom(w) {
   const zmin = getZoomMin();
   cardZoom = Math.min(ZOOM_MAX, Math.max(zmin, w));
 
-  if (!isMobile()) {
-    const card = document.getElementById('schedule-card');
-    const extra = Math.max(0, (cardZoom - 520) / 2);
+  const card = document.getElementById('schedule-card');
+  const inner = document.getElementById('pages-inner');
+
+  if (isMobile()) {
     if (card) {
-      card.style.marginLeft = (-14 - extra) + 'px';
-      card.style.marginRight = (-14 - extra) + 'px';
+      card.style.width = '100vw';
+      card.style.marginLeft = '-14px';
+      card.style.marginRight = '0';
     }
+    if (inner) inner.style.width = cardZoom + 'px';
+  } else {
+    const cardW = Math.max(cardZoom, 520);
+    if (card) {
+      card.style.width = cardW + 'px';
+      const shift = Math.max(14, (cardW - 492) / 2);
+      card.style.marginLeft = '-' + shift + 'px';
+      card.style.marginRight = '-' + shift + 'px';
+    }
+    if (inner) inner.style.width = cardZoom + 'px';
   }
 
-  const inner = document.getElementById('pages-inner');
-  if (inner) inner.style.width = cardZoom + 'px';
   document.getElementById('zoom-pct').textContent = Math.round(cardZoom / def * 100) + '%';
 }
 
