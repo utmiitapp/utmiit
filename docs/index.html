@@ -111,13 +111,10 @@
     }
     #pages-inner {
       display: block;
-      /* min-width чтобы не сжималось; width ставится из JS */
     }
     #pages-inner .img-wrap { position: relative; margin-bottom: 2px; }
     #pages-inner .img-wrap:last-child { margin-bottom: 0; }
     #pages-inner img { width: 100%; height: auto; display: block; cursor: zoom-in; }
-
-    /* на десктопе ширина управляется из JS через setCardZoom */
 
     #zoom-bar {
       display: none;
@@ -144,7 +141,7 @@
     #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; overflow: hidden; cursor: zoom-out; touch-action: none; }
     #lightbox.open { display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }    #lightbox-inner { position: relative; transition: transform .15s ease; pointer-events: none; }
-    #lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; display: block; pointer-events: auto; cursor: grab; user-select: none; -webkit-user-drag: none; }
+    #lightbox img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 4px; display: block; pointer-events: auto; cursor: grab; user-select: none; -webkit-user-drag: none; }
     #lightbox img:active { cursor: grabbing; }
     #lightbox-tools { position: fixed; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; z-index: 510; }
     .lb-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15); background: rgba(30,30,30,.85); color: #fff; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(0,0,0,.4); cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform .12s, background .15s; }
@@ -369,7 +366,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 const ua = navigator.userAgent || '';
-const isAndroid = /android/i.test(ua);
 
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
@@ -448,7 +444,6 @@ async function loadSchedule(d, silent = false) {
 
     const inner = document.createElement('div');
     inner.id = 'pages-inner';
-    // ширина ставится позже в loadSchedule после showSt
     box.appendChild(inner);
 
     const ext = data.ext || 'png';
@@ -482,7 +477,6 @@ async function loadSchedule(d, silent = false) {
 
     showSt('pages');
     refreshTs = Date.now();
-    // ставим начальный зум под текущую ширину карточки
     setCardZoom(getZoomDefault());
     document.getElementById('dlnk').style.display = 'block';
     document.getElementById('dlnk').href = data.link || '#';
@@ -807,19 +801,15 @@ let cardZoom = 520;
 
 function setCardZoom(w) {
   const def = getZoomDefault();
-  const mob = isMobile();
   const zmin = getZoomMin();
+  cardZoom = Math.min(ZOOM_MAX, Math.max(zmin, w));
 
-  if (mob) {
-    cardZoom = Math.min(ZOOM_MAX, Math.max(zmin, w));
-  } else {
-    cardZoom = Math.min(ZOOM_MAX, Math.max(zmin, w));
+  if (!isMobile()) {
     const card = document.getElementById('schedule-card');
-    const appW = 520;
-    const extraEachSide = Math.max(0, (cardZoom - appW) / 2);
+    const extra = Math.max(0, (cardZoom - 520) / 2);
     if (card) {
-      card.style.marginLeft = (-14 - extraEachSide) + 'px';
-      card.style.marginRight = (-14 - extraEachSide) + 'px';
+      card.style.marginLeft = (-14 - extra) + 'px';
+      card.style.marginRight = (-14 - extra) + 'px';
     }
   }
 
@@ -860,8 +850,11 @@ async function shareImage(url) {
 
 function openSupport() {
   const url = 'https://t.me/' + SUPPORT;
-  try { tg?.openTelegramLink(url) || window.open(url, '_blank'); }
-  catch (_) { window.open(url, '_blank'); }
+  if (isTgWebApp && tg?.openTelegramLink) {
+    tg.openTelegramLink(url);
+  } else {
+    window.open(url, '_blank');
+  }
 }
 
 let toastT;
