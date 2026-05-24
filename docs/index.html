@@ -39,11 +39,8 @@
     .row-left { display: flex; align-items: center; gap: 14px; }
     .row-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .row-icon svg { width: 20px; height: 20px; }
-    .row-icon.blue  { background: rgba(52,120,246,.15); color: var(--acc); }
     .row-icon.green { background: rgba(52,199,89,.15);  color: var(--ok); }
-    .row-icon.orange{ background: rgba(255,149,0,.15);  color: #ff9500; }
     .row-title { font-weight: 800; font-size: 15px; }
-    .row-sub   { font-size: 12px; font-weight: 600; color: var(--sub); margin-top: 1px; }
     .chevron   { color: var(--sub); opacity: .5; }
     .chevron svg { width: 16px; height: 16px; }
 
@@ -92,6 +89,8 @@
       border-radius: 16px;
       box-shadow: var(--shad);
       background: var(--surf);
+      margin-left: -14px;
+      margin-right: -14px;
       margin-bottom: 14px;
       overflow: visible;
     }
@@ -100,11 +99,13 @@
       display: block;
       width: 100%;
       overflow-x: auto;
-      overflow-y: visible;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: thin;
       scrollbar-color: var(--surf2) transparent;
       border-radius: 0 0 16px 16px;
+    }
+    #pages-inner {
+      display: block;
     }
     #pages-inner .img-wrap { position: relative; margin-bottom: 2px; }
     #pages-inner .img-wrap:last-child { margin-bottom: 0; }
@@ -128,10 +129,14 @@
     #zoom-reset { font-size: 12px; font-weight: 800; color: var(--acc); background: none; border: none; cursor: pointer; padding: 0 4px; font-family: 'Nunito', sans-serif; }
     #zoom-fs { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--acc); background: none; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; padding: 0; }
     #zoom-fs svg { width: 14px; height: 14px; }
+    .img-share { position: absolute; bottom: 8px; right: 8px; width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--brd); background: var(--surf); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shad); }
+    .img-share svg { width: 18px; height: 18px; }
+    .img-share:active { transform: scale(.92); }
+
     #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; overflow: hidden; cursor: zoom-out; touch-action: none; }
     #lightbox.open { display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }    #lightbox-inner { position: relative; transition: transform .15s ease; pointer-events: none; }
-    #lightbox img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 4px; display: block; pointer-events: auto; cursor: grab; user-select: none; -webkit-user-drag: none; }
+    #lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; display: block; pointer-events: auto; cursor: grab; user-select: none; -webkit-user-drag: none; }
     #lightbox img:active { cursor: grabbing; }
     #lightbox-tools { position: fixed; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; z-index: 510; }
     .lb-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15); background: rgba(30,30,30,.85); color: #fff; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(0,0,0,.4); cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform .12s, background .15s; }
@@ -170,10 +175,6 @@
     .ntxt { font-size: 14px; font-weight: 600; margin-top: 3px; white-space: pre-wrap; word-break: break-word; }
     .dbtn { background: none; border: none; cursor: pointer; color: var(--sub); font-size: 16px; padding: 2px 4px; }
 
-    .toggle { width: 51px; height: 31px; border-radius: 16px; background: var(--surf2); position: relative; transition: background .2s; flex-shrink: 0; }
-    .toggle .thumb { position: absolute; top: 3px; left: 3px; width: 25px; height: 25px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.25); transition: transform .2s; }
-    .toggle.on { background: var(--acc); }
-    .toggle.on .thumb { transform: translateX(20px); }
     #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(16px); background: #1c1c1e; color: #fff; border-radius: 30px; padding: 10px 22px; font-weight: 700; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .22s, transform .22s; white-space: nowrap; z-index: 999; }
     #toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
@@ -330,11 +331,13 @@ const tg = window.Telegram?.WebApp;
 const isTgWebApp = !!(tg && (tg.initData || (tg.initDataUnsafe && Object.keys(tg.initDataUnsafe).length)));
 if (isTgWebApp) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.(); }
 
+const DAYS   = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 const DNAMES = {monday:'Понедельник',tuesday:'Вторник',wednesday:'Среда',thursday:'Четверг',friday:'Пятница',saturday:'Суббота',general:'Общая'};
-const ALL_DAYS = ['monday','tuesday','wednesday','thursday','friday','saturday','general'];
 const hashes = {};
 
 let day = null, pollT = null, saveT = null;
+
+const THEME_KEY = 'theme';
 
 window.addEventListener('DOMContentLoaded', () => {
   initTheme();
@@ -342,7 +345,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const s = new Date().toLocaleDateString('ru-RU', {weekday:'long',day:'numeric',month:'long'});
   document.getElementById('date-line').textContent = s[0].toUpperCase() + s.slice(1);
 
-  const today = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][new Date().getDay()];
+  const today = DAYS[new Date().getDay()];
   document.querySelector(`[data-day="${today}"]`)?.classList.add('today');
   const defaultDay = today === 'sunday' ? 'monday' : today;
   selectDay(defaultDay);
@@ -353,6 +356,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(checkDayChange, 60 * 1000);
 });
 
+
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
   document.getElementById('theme-icon').innerHTML = t === 'light'
@@ -361,7 +365,7 @@ function applyTheme(t) {
 }
 
 function initTheme() {
-  const saved = localStorage.getItem('theme');
+  const saved = localStorage.getItem(THEME_KEY);
   if (saved) { applyTheme(saved); return; }
   const scheme = tg?.colorScheme;
   if (scheme === 'dark' || scheme === 'light') applyTheme(scheme);
@@ -371,13 +375,13 @@ function initTheme() {
 function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme') || 'light';
   const t = current === 'light' ? 'dark' : 'light';
-  localStorage.setItem('theme', t);
+  localStorage.setItem(THEME_KEY, t);
   applyTheme(t);
 }
 
 if (isTgWebApp && tg?.onEvent) {
   tg.onEvent('themeChanged', () => {
-    if (localStorage.getItem('theme')) return;
+    if (localStorage.getItem(THEME_KEY)) return;
     const scheme = tg.colorScheme;
     if (scheme === 'dark' || scheme === 'light') applyTheme(scheme);
   });
@@ -385,10 +389,11 @@ if (isTgWebApp && tg?.onEvent) {
 
 function setPage(p) {
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-  document.getElementById('page-' + p).classList.add('active');
+  document.getElementById('page-' + p)?.classList.add('active');
   document.querySelectorAll('.nb').forEach(el => el.classList.remove('active'));
   document.getElementById('nav-' + p)?.classList.add('active');
   if (p === 'notes') { loadNote(day || 'general'); renderNotes(); }
+  window.scrollTo(0, 0);
 }
 
 function selectDay(d) {
@@ -400,8 +405,7 @@ function selectDay(d) {
 }
 
 function checkDayChange() {
-  const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-  const t = days[new Date().getDay()];
+  const t = DAYS[new Date().getDay()];
   const nowDay = t === 'sunday' ? 'monday' : t;
   if (day !== nowDay) {
     document.querySelectorAll('.dbn').forEach(b => b.classList.toggle('today', b.dataset.day === nowDay));
@@ -431,6 +435,7 @@ async function loadSchedule(d, silent = false) {
 
     const inner = document.createElement('div');
     inner.id = 'pages-inner';
+    // ширина ставится позже в loadSchedule после showSt
     box.appendChild(inner);
 
     const ext = data.ext || 'png';
@@ -449,13 +454,21 @@ async function loadSchedule(d, silent = false) {
       const wrap = document.createElement('div');
       wrap.className = 'img-wrap';
       wrap.appendChild(img);
+
+      const shareBtn = document.createElement('button');
+      shareBtn.type = 'button';
+      shareBtn.className = 'img-share';
+      shareBtn.innerHTML = `<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M10 7h7v7"/></svg>`;
+      shareBtn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); shareImage(img.src); };
+      wrap.appendChild(shareBtn);
+
       inner.appendChild(wrap);
       document.getElementById('prog-fill').style.width = Math.round((i+1)/data.pages*100) + '%';
       document.getElementById('prog-txt').textContent = `Страница ${i+1} из ${data.pages}`;
     }
 
     showSt('pages');
-    setCardZoom(getZoomDefault());
+        setCardZoom(getZoomDefault());
     document.getElementById('dlnk').style.display = 'block';
     document.getElementById('dlnk').href = data.link || '#';
     document.getElementById('zoom-bar').classList.add('show');
@@ -487,7 +500,6 @@ function showSt(st, msg) {
 }
 
 let ptr_startY = 0, ptr_pulling = false;
-
 document.addEventListener('touchstart', e => {
   if (window.scrollY === 0) { ptr_startY = e.touches[0].clientY; ptr_pulling = true; }
 }, {passive: true});
@@ -757,43 +769,36 @@ const ZOOM_MAX  = 2000;
 function isMobile() { return window.innerWidth < 700; }
 
 function getZoomDefault() {
-  const vw = window.innerWidth;
-  if (isMobile()) return vw;
-  return Math.round(Math.min(1100, vw - 80) * 0.9);
+  if (isMobile()) return window.innerWidth - 28; // карточка минус паддинги
+  return Math.round(Math.min(1100, window.innerWidth - 80) * 0.9);
 }
 
 function getZoomMin() {
-  return isMobile() ? window.innerWidth : 500;
+  // на мобиле можно уменьшить до 300 — скролл покажет всё
+  return isMobile() ? 300 : 500;
 }
 
-let cardZoom = 520;
+let cardZoom = 0;
 
 function setCardZoom(w) {
   const def = getZoomDefault();
   const zmin = getZoomMin();
   cardZoom = Math.min(ZOOM_MAX, Math.max(zmin, w));
 
-  const card = document.getElementById('schedule-card');
-  const inner = document.getElementById('pages-inner');
-
-  if (isMobile()) {
+  // на мобиле карточка всегда на весь экран, только inner скроллится
+  // на ПК карточка растёт вместе с inner
+  if (!isMobile()) {
+    const card = document.getElementById('schedule-card');
+    const appW = 520;
+    const extra = Math.max(0, (cardZoom - appW) / 2);
     if (card) {
-      card.style.width = '100vw';
-      card.style.marginLeft = '-14px';
-      card.style.marginRight = '0';
+      card.style.marginLeft = (-14 - extra) + 'px';
+      card.style.marginRight = (-14 - extra) + 'px';
     }
-    if (inner) inner.style.width = cardZoom + 'px';
-  } else {
-    const cardW = Math.max(cardZoom, 520);
-    if (card) {
-      card.style.width = cardW + 'px';
-      const shift = Math.max(14, (cardW - 492) / 2);
-      card.style.marginLeft = '-' + shift + 'px';
-      card.style.marginRight = '-' + shift + 'px';
-    }
-    if (inner) inner.style.width = cardZoom + 'px';
   }
 
+  const inner = document.getElementById('pages-inner');
+  if (inner) inner.style.width = cardZoom + 'px';
   document.getElementById('zoom-pct').textContent = Math.round(cardZoom / def * 100) + '%';
 }
 
@@ -805,13 +810,32 @@ document.getElementById('zoom-fs').addEventListener('click', () => {
   if (src) openLightbox(src);
 });
 
+async function shareImage(url) {
+  if (isTgWebApp) {
+    toast('Доступно в браузере');
+    return;
+  }
+  if (!navigator.share) {
+    toast('Поделиться не поддерживается в этом браузере');
+    return;
+  }
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const ext = (blob.type || '').includes('png') ? 'png' : 'jpg';
+    const file = new File([blob], `schedule.${ext}`, { type: blob.type || 'image/jpeg' });
+    if (navigator.canShare && !navigator.canShare({ files: [file] })) {
+      toast('Поделиться не поддерживается');
+      return;
+    }
+    await navigator.share({ files: [file] });
+  } catch (_) {}
+}
+
 function openSupport() {
   const url = 'https://t.me/' + SUPPORT;
-  if (isTgWebApp && tg?.openTelegramLink) {
-    tg.openTelegramLink(url);
-  } else {
-    window.open(url, '_blank');
-  }
+  try { tg?.openTelegramLink(url) || window.open(url, '_blank'); }
+  catch (_) { window.open(url, '_blank'); }
 }
 
 let toastT;
@@ -822,7 +846,7 @@ function toast(msg) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=25', { scope: './' });
+  navigator.serviceWorker.register('./sw.js?v=20', { scope: './' });
 }
 </script>
 </body>
