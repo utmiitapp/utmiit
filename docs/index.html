@@ -106,9 +106,6 @@
       scrollbar-color: var(--surf2) transparent;
       border-radius: 0 0 16px 16px;
     }
-    #pages-inner {
-      display: block;
-    }
     #pages-inner .img-wrap { position: relative; margin-bottom: 2px; }
     #pages-inner .img-wrap:last-child { margin-bottom: 0; }
     #pages-inner img { width: 100%; height: auto; display: block; cursor: zoom-in; }
@@ -131,10 +128,6 @@
     #zoom-reset { font-size: 12px; font-weight: 800; color: var(--acc); background: none; border: none; cursor: pointer; padding: 0 4px; font-family: 'Nunito', sans-serif; }
     #zoom-fs { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--acc); background: none; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; padding: 0; }
     #zoom-fs svg { width: 14px; height: 14px; }
-    .img-share { position: absolute; bottom: 8px; right: 8px; width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--brd); background: var(--surf); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shad); }
-    .img-share svg { width: 18px; height: 18px; }
-    .img-share:active { transform: scale(.92); }
-
     #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; overflow: hidden; cursor: zoom-out; touch-action: none; }
     #lightbox.open { display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }    #lightbox-inner { position: relative; transition: transform .15s ease; pointer-events: none; }
@@ -337,13 +330,11 @@ const tg = window.Telegram?.WebApp;
 const isTgWebApp = !!(tg && (tg.initData || (tg.initDataUnsafe && Object.keys(tg.initDataUnsafe).length)));
 if (isTgWebApp) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.(); }
 
-const DAYS   = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 const DNAMES = {monday:'Понедельник',tuesday:'Вторник',wednesday:'Среда',thursday:'Четверг',friday:'Пятница',saturday:'Суббота',general:'Общая'};
+const ALL_DAYS = ['monday','tuesday','wednesday','thursday','friday','saturday','general'];
 const hashes = {};
 
-let day = null, pollT = null, refreshTs = null, saveT = null;
-
-const THEME_KEY = 'theme';
+let day = null, pollT = null, saveT = null;
 
 window.addEventListener('DOMContentLoaded', () => {
   initTheme();
@@ -351,7 +342,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const s = new Date().toLocaleDateString('ru-RU', {weekday:'long',day:'numeric',month:'long'});
   document.getElementById('date-line').textContent = s[0].toUpperCase() + s.slice(1);
 
-  const today = DAYS[new Date().getDay()];
+  const today = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][new Date().getDay()];
   document.querySelector(`[data-day="${today}"]`)?.classList.add('today');
   const defaultDay = today === 'sunday' ? 'monday' : today;
   selectDay(defaultDay);
@@ -370,7 +361,7 @@ function applyTheme(t) {
 }
 
 function initTheme() {
-  const saved = localStorage.getItem(THEME_KEY);
+  const saved = localStorage.getItem('theme');
   if (saved) { applyTheme(saved); return; }
   const scheme = tg?.colorScheme;
   if (scheme === 'dark' || scheme === 'light') applyTheme(scheme);
@@ -380,13 +371,13 @@ function initTheme() {
 function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme') || 'light';
   const t = current === 'light' ? 'dark' : 'light';
-  localStorage.setItem(THEME_KEY, t);
+  localStorage.setItem('theme', t);
   applyTheme(t);
 }
 
 if (isTgWebApp && tg?.onEvent) {
   tg.onEvent('themeChanged', () => {
-    if (localStorage.getItem(THEME_KEY)) return;
+    if (localStorage.getItem('theme')) return;
     const scheme = tg.colorScheme;
     if (scheme === 'dark' || scheme === 'light') applyTheme(scheme);
   });
@@ -409,7 +400,8 @@ function selectDay(d) {
 }
 
 function checkDayChange() {
-  const t = DAYS[new Date().getDay()];
+  const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+  const t = days[new Date().getDay()];
   const nowDay = t === 'sunday' ? 'monday' : t;
   if (day !== nowDay) {
     document.querySelectorAll('.dbn').forEach(b => b.classList.toggle('today', b.dataset.day === nowDay));
@@ -457,21 +449,12 @@ async function loadSchedule(d, silent = false) {
       const wrap = document.createElement('div');
       wrap.className = 'img-wrap';
       wrap.appendChild(img);
-
-      const shareBtn = document.createElement('button');
-      shareBtn.type = 'button';
-      shareBtn.className = 'img-share';
-      shareBtn.innerHTML = `<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M10 7h7v7"/></svg>`;
-      shareBtn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); shareImage(img.src); };
-      wrap.appendChild(shareBtn);
-
       inner.appendChild(wrap);
       document.getElementById('prog-fill').style.width = Math.round((i+1)/data.pages*100) + '%';
       document.getElementById('prog-txt').textContent = `Страница ${i+1} из ${data.pages}`;
     }
 
     showSt('pages');
-    refreshTs = Date.now();
     setCardZoom(getZoomDefault());
     document.getElementById('dlnk').style.display = 'block';
     document.getElementById('dlnk').href = data.link || '#';
@@ -504,7 +487,6 @@ function showSt(st, msg) {
 }
 
 let ptr_startY = 0, ptr_pulling = false;
-const PTR_THRESHOLD = 70;
 
 document.addEventListener('touchstart', e => {
   if (window.scrollY === 0) { ptr_startY = e.touches[0].clientY; ptr_pulling = true; }
@@ -514,7 +496,7 @@ document.addEventListener('touchend', e => {
   if (!ptr_pulling) return;
   const diff = e.changedTouches[0].clientY - ptr_startY;
   ptr_pulling = false;
-  if (diff > PTR_THRESHOLD && day) {
+  if (diff > 70 && day) {
     delete hashes[day];
     loadSchedule(day, false);
   }
@@ -529,7 +511,6 @@ const CALLS = {
       {n:4, p1:'14:45-15:30', p2:'15:35-16:20',  meal:null},
     ],
     breaks: [{after:2, text:'🍴 Обед  12:00-12:30'}, {after:2, text:'🕐 Классные часы  12:30-13:00'}],
-    special: null,
   },
   thursday: {
     lessons: [
@@ -539,7 +520,6 @@ const CALLS = {
       {n:4, p1:'14:10-14:55', p2:'15:00-15:45',  meal:null},
     ],
     breaks: [{after:2, text:'🍴 Обед  12:00-12:30'}, {after:4, text:'🕐 Классные часы (1 курс): 15:50-16:20'}],
-    special: null,
   },
   other: {
     lessons: [
@@ -550,7 +530,6 @@ const CALLS = {
       {n:5, p1:'16:05-16:50', p2:'16:55-17:40',  meal:null},
     ],
     breaks: [{after:2, text:'🍴 Обед  12:00-12:40'}],
-    special: null,
   },
 };
 
@@ -826,28 +805,6 @@ document.getElementById('zoom-fs').addEventListener('click', () => {
   if (src) openLightbox(src);
 });
 
-async function shareImage(url) {
-  if (isTgWebApp) {
-    toast('Доступно в браузере');
-    return;
-  }
-  if (!navigator.share) {
-    toast('Поделиться не поддерживается в этом браузере');
-    return;
-  }
-  try {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    const ext = (blob.type || '').includes('png') ? 'png' : 'jpg';
-    const file = new File([blob], `schedule.${ext}`, { type: blob.type || 'image/jpeg' });
-    if (navigator.canShare && !navigator.canShare({ files: [file] })) {
-      toast('Поделиться не поддерживается');
-      return;
-    }
-    await navigator.share({ files: [file] });
-  } catch (_) {}
-}
-
 function openSupport() {
   const url = 'https://t.me/' + SUPPORT;
   if (isTgWebApp && tg?.openTelegramLink) {
@@ -865,7 +822,7 @@ function toast(msg) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=20', { scope: './' });
+  navigator.serviceWorker.register('./sw.js?v=25', { scope: './' });
 }
 </script>
 </body>
