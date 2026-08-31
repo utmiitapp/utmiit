@@ -1,4 +1,4 @@
-const CACHE = 'schedule-v25';
+const CACHE = 'schedule-v26';
 const IMG_CACHE = 'schedule-imgs-v1';
 const INDEX = new URL('./index.html', self.location).pathname;
 const MANIFEST = new URL('./manifest.json', self.location).pathname;
