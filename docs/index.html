@@ -11,7 +11,21 @@
   <link rel="manifest" href="./manifest.json"/>
 
   <link rel="apple-touch-icon" href="icon-512.png"/>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    // Грузим telegram-web-app.js неблокирующе: страница не должна ждать
+    // этот скрипт, если telegram.org недоступен (например, в РФ без VPN).
+    // Ждём не дольше 1 секунды — этого достаточно, если сайт открыт
+    // внутри самого Telegram, и не создаёт заметной задержки в обычном браузере.
+    window.__tgScriptLoaded = new Promise(function (resolve) {
+      var s = document.createElement('script');
+      s.src = 'https://telegram.org/js/telegram-web-app.js';
+      s.async = true;
+      s.onload = function () { resolve(true); };
+      s.onerror = function () { resolve(false); };
+      document.head.appendChild(s);
+      setTimeout(function () { resolve(false); }, 1000);
+    });
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet"/>
   <style>
 
@@ -327,9 +341,30 @@ const SUPPORT = 'ueaio';
 const POLL_MS = 5 * 60 * 1000;
 const NOTE_MAX = 500;
 
-const tg = window.Telegram?.WebApp;
-const isTgWebApp = !!(tg && (tg.initData || (tg.initDataUnsafe && Object.keys(tg.initDataUnsafe).length)));
-if (isTgWebApp) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.(); }
+let tg = null;
+let isTgWebApp = false;
+
+// Ждёт неблокирующую загрузку telegram-web-app.js (см. <head>, максимум 1с)
+// и только потом проверяет наличие Telegram.WebApp. Нужно, потому что
+// скрипт теперь грузится асинхронно и может быть ещё не готов в момент
+// разбора этого блока.
+async function initTelegram() {
+  await window.__tgScriptLoaded;
+  tg = window.Telegram?.WebApp || null;
+  isTgWebApp = !!(tg && (tg.initData || (tg.initDataUnsafe && Object.keys(tg.initDataUnsafe).length)));
+  if (isTgWebApp) {
+    tg.ready();
+    tg.expand();
+    tg.disableVerticalSwipes?.();
+    if (tg.onEvent) {
+      tg.onEvent('themeChanged', () => {
+        if (localStorage.getItem(THEME_KEY)) return;
+        const scheme = tg.colorScheme;
+        if (scheme === 'dark' || scheme === 'light') applyTheme(scheme);
+      });
+    }
+  }
+}
 
 const DAYS   = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 const DNAMES = {monday:'Понедельник',tuesday:'Вторник',wednesday:'Среда',thursday:'Четверг',friday:'Пятница',saturday:'Суббота',general:'Общая'};
@@ -339,7 +374,8 @@ let day = null, pollT = null, saveT = null;
 
 const THEME_KEY = 'theme';
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
+  await initTelegram();
   initTheme();
 
   const s = new Date().toLocaleDateString('ru-RU', {weekday:'long',day:'numeric',month:'long'});
@@ -377,14 +413,6 @@ function toggleTheme() {
   const t = current === 'light' ? 'dark' : 'light';
   localStorage.setItem(THEME_KEY, t);
   applyTheme(t);
-}
-
-if (isTgWebApp && tg?.onEvent) {
-  tg.onEvent('themeChanged', () => {
-    if (localStorage.getItem(THEME_KEY)) return;
-    const scheme = tg.colorScheme;
-    if (scheme === 'dark' || scheme === 'light') applyTheme(scheme);
-  });
 }
 
 function setPage(p) {
@@ -846,7 +874,7 @@ function toast(msg) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=20', { scope: './' });
+  navigator.serviceWorker.register('./sw.js?v=21', { scope: './' });
 }
 </script>
 </body>
