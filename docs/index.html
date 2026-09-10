@@ -26,6 +26,8 @@
       setTimeout(function () { resolve(false); }, 1000);
     });
   </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet"/>
   <style>
 
@@ -395,6 +397,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', t === 'dark' ? '#1c1c1e' : '#3478f6');
+  tg?.setHeaderColor?.(t === 'dark' ? '#1c1c1e' : '#3478f6');
+  tg?.setBackgroundColor?.(t === 'dark' ? '#2A2A2A' : '#f2f2f7');
   document.getElementById('theme-icon').innerHTML = t === 'light'
     ? `<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`
     : `<path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>`;
@@ -471,7 +477,8 @@ async function loadSchedule(d, silent = false) {
     for (let i = 0; i < data.pages; i++) {
       const img = new Image();
       img.src = `${STATIC_BASE}/${d}/page-${i+1}.${ext}?v=${encodeURIComponent(cacheKey)}`;
-      img.loading = 'eager';
+      img.alt = `Расписание, ${DNAMES[d] || d}, страница ${i+1} из ${data.pages}`;
+      img.loading = i === 0 ? 'eager' : 'lazy';
       img.decoding = 'async';
       img.onerror = () => {
         if (img.dataset.fallback) return;
@@ -527,16 +534,20 @@ function showSt(st, msg) {
   if (msg) document.getElementById('err-msg').textContent = '⚠️ ' + msg;
 }
 
-let ptr_startY = 0, ptr_pulling = false;
+let ptr_startY = 0, ptr_startX = 0, ptr_pulling = false;
 document.addEventListener('touchstart', e => {
-  if (window.scrollY === 0) { ptr_startY = e.touches[0].clientY; ptr_pulling = true; }
+  if (window.scrollY === 0 && e.touches.length === 1) {
+    ptr_startY = e.touches[0].clientY; ptr_startX = e.touches[0].clientX; ptr_pulling = true;
+  }
 }, {passive: true});
 
 document.addEventListener('touchend', e => {
   if (!ptr_pulling) return;
-  const diff = e.changedTouches[0].clientY - ptr_startY;
   ptr_pulling = false;
-  if (diff > 70 && day) {
+  const dy = e.changedTouches[0].clientY - ptr_startY;
+  const dx = e.changedTouches[0].clientX - ptr_startX;
+  // только вертикальный свайп вниз, чтобы не мешать горизонтальному скроллу/зуму
+  if (dy > 70 && Math.abs(dy) > Math.abs(dx) * 1.5 && day) {
     delete hashes[day];
     loadSchedule(day, false);
   }
@@ -862,8 +873,11 @@ async function shareImage(url) {
 
 function openSupport() {
   const url = 'https://t.me/' + SUPPORT;
-  try { tg?.openTelegramLink(url) || window.open(url, '_blank'); }
-  catch (_) { window.open(url, '_blank'); }
+  if (isTgWebApp && tg && typeof tg.openTelegramLink === 'function') {
+    tg.openTelegramLink(url);
+  } else {
+    window.open(url, '_blank', 'noopener');
+  }
 }
 
 let toastT;
