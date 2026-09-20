@@ -67,11 +67,6 @@
     .ibtn { width: 36px; height: 36px; border-radius: 50%; background: var(--surf); border: 1px solid var(--brd); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shad); color: var(--text); transition: transform .15s; position: relative; }
     .ibtn:active { transform: scale(.88); }
     .ibtn svg { width: 17px; height: 17px; }
-    .badge { position: absolute; top: -2px; right: -2px; width: 9px; height: 9px; border-radius: 50%; background: var(--danger); border: 2px solid var(--bg); display: none; }
-    .badge.on { display: block; }
-
-    .sbtn { background: var(--acc); color: var(--acct); border: none; border-radius: 12px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; padding: 12px; cursor: pointer; width: 100%; margin-top: 10px; transition: opacity .15s; }
-    .sbtn:active { opacity: .8; }
 
     .topbar { display: flex; align-items: flex-start; justify-content: space-between; padding: 18px 0 14px; }
     .topbar h1 { font-size: 24px; font-weight: 900; letter-spacing: -.5px; }
@@ -91,7 +86,6 @@
     @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     #page-schedule .topbar { opacity: 0; animation: fadeUp .45s ease forwards; }
     #page-schedule .dgrid { opacity: 0; animation: fadeUp .45s .06s ease forwards; }
-    #page-schedule #schedule-card { opacity: 0; animation: fadeUp .45s .12s ease forwards; }
 
     .dgrid { display: grid; grid-template-columns: repeat(6,1fr); gap: 7px; margin-bottom: 18px; }
     .dbn { background: var(--surf); color: var(--sub); border: 1px solid var(--brd); border-radius: 12px; padding: 11px 0 9px; cursor: pointer; font-family: 'Nunito',sans-serif; font-weight: 800; font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 5px; box-shadow: var(--shad-sm); transition: background .15s, color .15s, transform .1s; }
@@ -101,75 +95,15 @@
     .dbn.active .dot { background: rgba(255,255,255,.55); }
     .dbn:active { transform: scale(.92); }
 
-    @keyframes shimmer { to { background-position: 600px 0; } }
-    .skel { border-radius: 10px; background: linear-gradient(90deg, var(--surf2) 25%, var(--brd) 37%, var(--surf2) 63%); background-size: 600px 100%; animation: shimmer 1.3s infinite linear; }
     .empty-s { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 40px 0; color: var(--sub); font-weight: 700; font-size: 15px; }
     .empty-s svg { width: 52px; height: 52px; opacity: .35; }
-    .err-box { background: rgba(255,59,48,.1); border: 1px solid rgba(255,59,48,.25); border-radius: 12px; padding: 12px; color: var(--danger); font-weight: 700; font-size: 14px; text-align: center; }
 
     .card { background: var(--surf); border: 1px solid var(--brd); border-radius: 18px; box-shadow: var(--shad); overflow: hidden; }
 
-    #schedule-card {
-      border-radius: 16px;
-      border: 1px solid var(--brd);
-      box-shadow: var(--shad);
-      background: var(--surf);
-      margin-left: -14px;
-      margin-right: -14px;
-      margin-bottom: 14px;
-      overflow: visible;
-    }
-
-    #pages {
-      display: block;
-      width: 100%;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: thin;
-      scrollbar-color: var(--surf2) transparent;
-      border-radius: 0 0 16px 16px;
-    }
-    #pages-inner {
-      display: block;
-    }
-    #pages-inner .img-wrap { position: relative; margin-bottom: 2px; }
-    #pages-inner .img-wrap:last-child { margin-bottom: 0; }
-    #pages-inner img { width: 100%; height: auto; display: block; cursor: zoom-in; }
-
-    #zoom-bar {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--brd);
-      background: var(--surf);
-      border-radius: 16px 16px 0 0;
-    }
-    #zoom-bar.show { display: flex; }
-    .dlnk { display: none; padding: 10px; text-align: center; font-size: 13px; font-weight: 700; color: var(--acc); text-decoration: none; border-top: 1px solid var(--brd); background: var(--surf); border-radius: 0 0 16px 16px; }
-    .zbar-left { display: flex; align-items: center; gap: 6px; }
-    .zbtn { width: 32px; height: 32px; border-radius: 9px; border: none; background: var(--surf2); color: var(--text); font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .12s, transform .1s; flex-shrink: 0; line-height: 1; }
-    .zbtn:active { transform: scale(.87); background: var(--acc); color: #fff; }
-    #zoom-pct { font-size: 12px; font-weight: 800; color: var(--sub); min-width: 40px; text-align: center; }
-    #zoom-reset { font-size: 12px; font-weight: 800; color: var(--acc); background: none; border: none; cursor: pointer; padding: 0 4px; font-family: 'Nunito', sans-serif; }
-    #zoom-fs { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; color: var(--acc); background: none; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; padding: 0; }
-    #zoom-fs svg { width: 14px; height: 14px; }
-    .img-share { position: absolute; bottom: 8px; right: 8px; width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--brd); background: var(--surf); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shad); }
-    .img-share svg { width: 18px; height: 18px; }
-    .img-share:active { transform: scale(.92); }
-
-    #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 500; overflow: hidden; cursor: zoom-out; touch-action: none; }
-    #lightbox.open { display: flex; align-items: center; justify-content: center; animation: fadeIn .2s ease; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }    #lightbox-inner { position: relative; transition: transform .15s ease; pointer-events: none; }
-    #lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; display: block; pointer-events: auto; cursor: grab; user-select: none; -webkit-user-drag: none; }
-    #lightbox img:active { cursor: grabbing; }
-    #lightbox-tools { position: fixed; right: 12px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; z-index: 510; }
-    .lb-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15); background: rgba(30,30,30,.85); color: #fff; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(0,0,0,.4); cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform .12s, background .15s; }
-    .lb-btn:hover { background: rgba(60,60,60,.9); }
-    .lb-btn:active { transform: scale(.88); }
-    #lb-zoom-label { position: fixed; left: 12px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); font-size: 13px; font-weight: 800; color: rgba(255,255,255,.7); z-index: 510; pointer-events: none; font-family: 'Nunito', sans-serif; transition: opacity .2s; }
-    .prog-bg { width: 100%; height: 4px; background: var(--surf2); border-radius: 4px; overflow: hidden; margin-top: 8px; }
-    .prog-fill { height: 4px; background: var(--acc); border-radius: 4px; width: 0; transition: width .2s; }
+    .ggrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 7px; padding: 12px; }
+    .gbtn { background: var(--surf); color: var(--text); border: 1px solid var(--brd); border-radius: 12px; padding: 10px 4px; cursor: pointer; font-family: 'Nunito',sans-serif; font-weight: 800; font-size: 13px; text-align: center; transition: background .15s, color .15s, transform .1s; }
+    .gbtn.active { background: var(--acc); color: var(--acct); border-color: var(--acc); }
+    .gbtn:active { transform: scale(.93); }
 
     .pills { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
     .pills::-webkit-scrollbar { display: none; }
@@ -190,26 +124,12 @@
     .cl-break { padding: 8px 12px; font-size: 12px; font-weight: 800; color: var(--sub); background: var(--bg); border-bottom: 1px solid var(--brd); display: flex; justify-content: center; align-items: center; text-align: center; }
     .cl-list > :last-child { border-bottom: none; }
 
-    .gsearch { width: 100%; background: var(--surf); color: var(--text); border: 1px solid var(--brd); border-radius: 12px; padding: 11px 14px; font-family: 'Nunito',sans-serif; font-size: 14px; font-weight: 700; outline: none; box-shadow: var(--shad-sm); margin-bottom: 12px; transition: border-color .15s; }
-    .gsearch:focus { border-color: var(--acc); }
     .lbody { padding-left: 42px; flex: 1; min-width: 0; }
     .ltitle { font-size: 14px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ltitle.miss { color: var(--sub); }
     .lroom { font-size: 12px; font-weight: 800; color: var(--acc); background: var(--acc-soft); border-radius: 7px; padding: 3px 8px; flex-shrink: 0; margin-left: 8px; }
-    .row.gactive .row-title { color: var(--acc); }
     .row-sub { font-size: 11px; font-weight: 700; color: var(--sub); margin-top: 2px; }
 
-    .slabel { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--sub); margin-bottom: 8px; }
-    textarea { width: 100%; background: var(--bg); color: var(--text); border: 1.5px solid var(--brd); border-radius: 12px; padding: 12px; font-family: 'Nunito',sans-serif; font-size: 15px; font-weight: 600; resize: none; outline: none; transition: border-color .15s; }
-    textarea:focus { border-color: var(--acc); }
-    select { background: var(--bg); color: var(--text); border: 1.5px solid var(--brd); border-radius: 10px; padding: 7px 10px; font-family: 'Nunito',sans-serif; font-weight: 700; font-size: 14px; outline: none; flex: 1; }
-    .nitem { padding: 12px 14px; border-bottom: 1px solid var(--brd); }
-    .nitem:last-child { border-bottom: none; }
-    .ntag { font-size: 11px; font-weight: 800; color: var(--acc); text-transform: uppercase; letter-spacing: .06em; }
-    .ntxt { font-size: 14px; font-weight: 600; margin-top: 3px; white-space: pre-wrap; word-break: break-word; }
-    .dbtn { background: none; border: none; cursor: pointer; color: var(--sub); font-size: 16px; padding: 2px 4px; }
-
-    #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(16px); background: #1c1c1e; color: #fff; border-radius: 30px; padding: 10px 22px; font-weight: 700; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .22s, transform .22s; white-space: nowrap; z-index: 999; }
-    #toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
@@ -219,61 +139,11 @@
     <div class="topbar">
       <div><h1>📚Расписание</h1><div class="sub" id="date-line"></div></div>
       <div class="tr">
-        <button class="ibtn" onclick="setPage('notes')">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4z"/></svg>
-          <span class="badge" id="notes-badge"></span>
-        </button>
         <button class="ibtn" id="theme-btn" onclick="toggleTheme()">
           <svg id="theme-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         </button>
       </div>
     </div>
-
-    <div class="dgrid">
-      <button class="dbn" data-day="monday"    onclick="selectDay('monday')">   <span>Пн</span><span class="dot"></span></button>
-      <button class="dbn" data-day="tuesday"   onclick="selectDay('tuesday')">  <span>Вт</span><span class="dot"></span></button>
-      <button class="dbn" data-day="wednesday" onclick="selectDay('wednesday')"><span>Ср</span><span class="dot"></span></button>
-      <button class="dbn" data-day="thursday"  onclick="selectDay('thursday')"> <span>Чт</span><span class="dot"></span></button>
-      <button class="dbn" data-day="friday"    onclick="selectDay('friday')">   <span>Пт</span><span class="dot"></span></button>
-      <button class="dbn" data-day="saturday"  onclick="selectDay('saturday')"> <span>Сб</span><span class="dot"></span></button>
-    </div>
-
-    <div id="schedule-card">
-      <div id="zoom-bar">
-        <div class="zbar-left">
-          <button class="zbtn" id="zbtn-out">−</button>
-          <span id="zoom-pct">100%</span>
-          <button class="zbtn" id="zbtn-in">+</button>
-          <button id="zoom-reset">сброс</button>
-        </div>
-        <button id="zoom-fs">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-          На весь экран
-        </button>
-      </div>
-      <div id="img-area" style="min-height:200px;">
-        <div class="empty-s" id="st-empty">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.3"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>
-          <span>Выберите день</span>
-        </div>
-        <div class="skel" id="st-skel" style="width:100%;height:320px;display:none;"></div>
-        <div id="st-prog" style="display:none;width:100%;padding:12px 14px;">
-          <div class="skel" style="width:100%;height:280px;"></div>
-          <div class="prog-bg"><div class="prog-fill" id="prog-fill"></div></div>
-          <div id="prog-txt" style="font-size:11px;font-weight:700;color:var(--sub);text-align:center;margin-top:5px;"></div>
-        </div>
-        <div id="st-err" style="display:none;width:100%;padding:12px 14px;">
-          <div class="err-box" id="err-msg">Ошибка</div>
-          <button class="sbtn" onclick="retryLoad()">↺ Повторить</button>
-        </div>
-        <div id="pages" style="display:none;"></div>
-      </div>
-      <a id="dlnk" class="dlnk" href="#" target="_blank">Открыть в Google Drive</a>
-    </div>
-  </div>
-
-  <div id="page-groups" class="page">
-    <div class="topbar"><div><h1>👥Группы</h1></div></div>
 
     <div class="dgrid" id="gdgrid">
       <button class="dbn" data-gday="monday"    onclick="selectGroupDay('monday')">   <span>Пн</span><span class="dot"></span></button>
@@ -284,36 +154,8 @@
       <button class="dbn" data-gday="saturday"  onclick="selectGroupDay('saturday')"> <span>Сб</span><span class="dot"></span></button>
     </div>
 
-    <input id="gsearch" class="gsearch" type="text" placeholder="Поиск группы…" oninput="filterGroups(this.value)"/>
-
     <div class="card" id="glist-card" style="margin-bottom: 14px;"></div>
     <div class="card" id="glessons-card" style="display: none;"></div>
-  </div>
-
-  <div id="page-notes" class="page">
-    <div class="topbar">
-      <div><h1>📝Заметки</h1><div class="sub">Сохраняются на устройстве</div></div>
-      <div class="tr"><button class="ibtn" onclick="setPage('schedule')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button></div>
-    </div>
-    <div class="card" style="padding:14px;margin-bottom:14px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-        <span style="font-size:13px;font-weight:800;color:var(--sub);">День:</span>
-        <select id="note-day" onchange="loadNote(this.value)">
-          <option value="monday">Понедельник</option><option value="tuesday">Вторник</option>
-          <option value="wednesday">Среда</option><option value="thursday">Четверг</option>
-          <option value="friday">Пятница</option><option value="saturday">Суббота</option>
-          <option value="general">Общая</option>
-        </select>
-      </div>
-      <textarea id="note-ta" rows="5" placeholder="Домашнее задание, важные даты…" oninput="onNoteInput()"></textarea>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
-        <span id="note-chars" style="font-size:12px;font-weight:700;color:var(--sub);">0 / 500</span>
-        <span id="note-saved" style="font-size:11px;font-weight:700;color:var(--ok);opacity:0;transition:opacity .3s;">✓ Сохранено</span>
-      </div>
-      <button class="sbtn" onclick="saveNote()">Сохранить</button>
-    </div>
-    <div class="slabel">Все заметки</div>
-    <div class="card" id="all-notes"></div>
   </div>
 
   <div id="page-calls" class="page">
@@ -342,26 +184,10 @@
 
 </div>
 
-<div id="lightbox">
-  <div id="lightbox-inner">
-    <img id="lightbox-img" src="" alt=""/>
-  </div>
-  <div id="lightbox-tools">
-    <button class="lb-btn" id="lb-zout" title="Уменьшить">−</button>
-    <button class="lb-btn" id="lb-zin" title="Увеличить">+</button>
-    <button class="lb-btn" id="lb-close" title="Закрыть">✕</button>
-  </div>
-  <div id="lb-zoom-label">100%</div>
-</div>
-
 <nav class="bnav">
   <button class="nb active" id="nav-schedule" onclick="setPage('schedule')">
     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>
     Расписание<span class="dot"></span>
-  </button>
-  <button class="nb" id="nav-groups" onclick="setPage('groups')">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M2 21v-1a7 7 0 0114 0v1"/><circle cx="17" cy="8" r="3"/><path d="M22 21v-1a5 5 0 00-4-4.9"/></svg>
-    Группы<span class="dot"></span>
   </button>
   <button class="nb" id="nav-calls" onclick="setPage('calls')">
     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -373,22 +199,15 @@
   </button>
 </nav>
 
-<div id="toast"></div>
-
 <script>
 
 const STATIC_BASE = './schedule';
 const SUPPORT = 'ueaio';
-const POLL_MS = 5 * 60 * 1000;
-const NOTE_MAX = 500;
 
 let tg = null;
 let isTgWebApp = false;
 
-// Ждёт неблокирующую загрузку telegram-web-app.js (см. <head>, максимум 1с)
-// и только потом проверяет наличие Telegram.WebApp. Нужно, потому что
-// скрипт теперь грузится асинхронно и может быть ещё не готов в момент
-// разбора этого блока.
+// telegram-web-app.js грузится асинхронно (см. <head>) - ждём его до секунды
 async function initTelegram() {
   await window.__tgScriptLoaded;
   tg = window.Telegram?.WebApp || null;
@@ -408,13 +227,9 @@ async function initTelegram() {
 }
 
 const DAYS   = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-const DNAMES = {monday:'Понедельник',tuesday:'Вторник',wednesday:'Среда',thursday:'Четверг',friday:'Пятница',saturday:'Суббота',general:'Общая'};
-const hashes = {};
-
-let day = null, pollT = null, saveT = null;
 
 // --- Группы: выбор дня + группы, список пар текстом (как в боте) ---
-let gDay = null, gFilter = '', gSelectedGroup = null;
+let gDay = null, gSelectedGroup = null;
 const GROUPS_CACHE = {};
 const NON_LESSON_RE = /^классный\s*час/i;
 
@@ -447,41 +262,44 @@ async function loadGroupsDay(d) {
 function renderGroupList() {
   const card = document.getElementById('glist-card');
   const data = GROUPS_CACHE[gDay];
-  if (data === 'error' || !data || !Object.keys(data.groups || {}).length) {
+  const showEmpty = msg => {
     card.innerHTML = `<div class="empty-s" style="padding:30px 0;">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.3"><circle cx="9" cy="7" r="4"/><path d="M2 21v-1a7 7 0 0114 0v1"/><circle cx="17" cy="8" r="3"/><path d="M22 21v-1a5 5 0 00-4-4.9"/></svg>
-      <span>Замен на этот день нет</span></div>`;
-    return;
-  }
-  const names = Object.keys(data.groups).filter(g => g.toLowerCase().includes(gFilter.toLowerCase()));
-  if (!names.length) {
-    card.innerHTML = `<div class="empty-s" style="padding:30px 0;"><span>Группы не найдены</span></div>`;
-    return;
-  }
-  card.innerHTML = names.map(name => `
-    <div class="row${name === gSelectedGroup ? ' gactive' : ''}" onclick="selectGroup('${name.replace(/'/g, "\\'")}')">
-      <div class="row-title">${escapeHtml(name)}</div>
-      <div class="chevron"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
-    </div>`).join('');
-}
-
-function filterGroups(v) {
-  gFilter = v;
-  renderGroupList();
+      <span>${msg}</span></div>`;
+  };
+  if (data === 'error') return showEmpty('Данные ещё не загружены');
+  const names = Object.keys(data?.groups || {});
+  if (!names.length) return showEmpty('Замен на этот день нет');
+  card.innerHTML = '<div class="ggrid">' + names.map(name =>
+    `<button class="gbtn${name === gSelectedGroup ? ' active' : ''}" onclick="selectGroup('${name.replace(/'/g, "\\'")}')">${escapeHtml(name)}</button>`
+  ).join('') + '</div>';
 }
 
 function selectGroup(name) {
+  const card = document.getElementById('glessons-card');
+  if (name === gSelectedGroup) {
+    gSelectedGroup = null;
+    card.style.display = 'none';
+    renderGroupList();
+    return;
+  }
   gSelectedGroup = name;
   const data = GROUPS_CACHE[gDay];
   const lessons = (data.groups[name] || []).slice().sort((a, b) => a.n - b.n);
-  const card = document.getElementById('glessons-card');
   card.style.display = '';
   let rows = '';
   if (!lessons.length) {
     rows = `<div class="cl-break">На этот день занятий нет 🎉</div>`;
   } else {
+    const bySlot = new Map(lessons.map(l => [l.n, l]));
     let counter = 0;
-    for (const l of lessons) {
+    for (let slot = 1; slot <= lessons[lessons.length - 1].n; slot++) {
+      const l = bySlot.get(slot);
+      if (!l) {
+        counter++;
+        rows += `<div class="cl-item"><div class="cl-num">${counter}</div><div class="lbody"><div class="ltitle miss">—</div></div></div>`;
+        continue;
+      }
       if (l.subject && NON_LESSON_RE.test(l.subject)) {
         rows += `<div class="cl-break">⏳ Классный час</div>`;
         continue;
@@ -490,7 +308,7 @@ function selectGroup(name) {
       const room = (l.classroom || '').replace(/,/g, ', ');
       rows += `<div class="cl-item">
         <div class="cl-num">${counter}</div>
-        <div class="lbody"><div class="ltitle">${l.subject ? escapeHtml(l.subject) : 'Пары нет'}</div></div>
+        <div class="lbody"><div class="ltitle">${l.subject ? escapeHtml(l.subject) : '—'}</div></div>
         ${room ? `<div class="lroom">${escapeHtml(room)}</div>` : ''}
       </div>`;
     }
@@ -515,14 +333,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('date-line').textContent = s[0].toUpperCase() + s.slice(1);
 
   const today = DAYS[new Date().getDay()];
-  document.querySelector(`[data-day="${today}"]`)?.classList.add('today');
-  const defaultDay = today === 'sunday' ? 'monday' : today;
-  selectDay(defaultDay);
+  document.querySelector(`[data-gday="${today}"]`)?.classList.add('today');
 
   showCalls('monday');
-  renderNotes();
-  updateBadge();
-  setInterval(checkDayChange, 60 * 1000);
+  setPage('schedule');
 });
 
 
@@ -557,139 +371,15 @@ function setPage(p) {
   document.getElementById('page-' + p)?.classList.add('active');
   document.querySelectorAll('.nb').forEach(el => el.classList.remove('active'));
   document.getElementById('nav-' + p)?.classList.add('active');
-  if (p === 'notes') { loadNote(day || 'general'); renderNotes(); }
-  if (p === 'groups') {
-    if (!gDay) {
-      const t = DAYS[new Date().getDay()];
-      gDay = t === 'sunday' ? 'monday' : t;
-    }
+  if (p === 'schedule' && !gDay) {
+    const t = DAYS[new Date().getDay()];
+    gDay = t === 'sunday' ? 'monday' : t;
     selectGroupDay(gDay);
   }
   window.scrollTo(0, 0);
 }
 
-function selectDay(d) {
-  day = d;
-  document.querySelectorAll('.dbn').forEach(b => b.classList.toggle('active', b.dataset.day === d));
-  clearInterval(pollT);
-  pollT = setInterval(() => checkHash(d), POLL_MS);
-  loadSchedule(d);
-}
 
-function checkDayChange() {
-  const t = DAYS[new Date().getDay()];
-  const nowDay = t === 'sunday' ? 'monday' : t;
-  if (day !== nowDay) {
-    document.querySelectorAll('.dbn').forEach(b => b.classList.toggle('today', b.dataset.day === nowDay));
-    selectDay(nowDay);
-  }
-}
-
-async function fetchManifest(d) {
-  const url = `${STATIC_BASE}/${d}/manifest.json?ts=${Date.now()}`;
-  const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  return await res.json();
-}
-
-async function loadSchedule(d, silent = false) {
-  if (!silent) showSt('skel');
-  try {
-    const data = await fetchManifest(d);
-
-    hashes[d] = data.hash;
-    const cacheKey = data.updated_at || data.hash || Date.now();
-
-    if (data.pages > 1 && !silent) showSt('prog');
-
-    const box = document.getElementById('pages');
-    box.innerHTML = '';
-
-    const inner = document.createElement('div');
-    inner.id = 'pages-inner';
-    // ширина ставится позже в loadSchedule после showSt
-    box.appendChild(inner);
-
-    const ext = data.ext || 'png';
-    const altExt = ext === 'jpg' ? 'png' : 'jpg';
-    for (let i = 0; i < data.pages; i++) {
-      const img = new Image();
-      img.src = `${STATIC_BASE}/${d}/page-${i+1}.${ext}?v=${encodeURIComponent(cacheKey)}`;
-      img.alt = `Расписание, ${DNAMES[d] || d}, страница ${i+1} из ${data.pages}`;
-      img.loading = i === 0 ? 'eager' : 'lazy';
-      img.decoding = 'async';
-      img.onerror = () => {
-        if (img.dataset.fallback) return;
-        img.dataset.fallback = '1';
-        img.src = `${STATIC_BASE}/${d}/page-${i+1}.${altExt}?v=${encodeURIComponent(cacheKey)}`;
-      };
-      img.onclick = () => openLightbox(img.src);
-      const wrap = document.createElement('div');
-      wrap.className = 'img-wrap';
-      wrap.appendChild(img);
-
-      const shareBtn = document.createElement('button');
-      shareBtn.type = 'button';
-      shareBtn.className = 'img-share';
-      shareBtn.innerHTML = `<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M10 7h7v7"/></svg>`;
-      shareBtn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); shareImage(img.src); };
-      wrap.appendChild(shareBtn);
-
-      inner.appendChild(wrap);
-      document.getElementById('prog-fill').style.width = Math.round((i+1)/data.pages*100) + '%';
-      document.getElementById('prog-txt').textContent = `Страница ${i+1} из ${data.pages}`;
-    }
-
-    showSt('pages');
-        setCardZoom(getZoomDefault());
-    document.getElementById('dlnk').style.display = 'block';
-    document.getElementById('dlnk').href = data.link || '#';
-    document.getElementById('zoom-bar').classList.add('show');
-  } catch (e) {
-    if (!silent) showSt('err', 'Не удалось загрузить расписание: ' + e.message);
-  }
-}
-
-async function checkHash(d) {
-  try {
-    const data = await fetchManifest(d);
-    if (data.hash !== hashes[d]) { loadSchedule(d, true); }
-  } catch (_) {}
-}
-
-function retryLoad() { if (day) loadSchedule(day); }
-
-function showSt(st, msg) {
-  document.getElementById('st-empty').style.display = st==='empty' ? 'flex'  : 'none';
-  document.getElementById('st-skel') .style.display = st==='skel'  ? 'block' : 'none';
-  document.getElementById('st-prog') .style.display = st==='prog'  ? 'block' : 'none';
-  document.getElementById('st-err')  .style.display = st==='err'   ? 'block' : 'none';
-  document.getElementById('pages')   .style.display = st==='pages' ? ''      : 'none';
-  if (st !== 'pages') {
-    document.getElementById('dlnk').style.display = 'none';
-    document.getElementById('zoom-bar').classList.remove('show');
-  }
-  if (msg) document.getElementById('err-msg').textContent = '⚠️ ' + msg;
-}
-
-let ptr_startY = 0, ptr_startX = 0, ptr_pulling = false;
-document.addEventListener('touchstart', e => {
-  if (window.scrollY === 0 && e.touches.length === 1) {
-    ptr_startY = e.touches[0].clientY; ptr_startX = e.touches[0].clientX; ptr_pulling = true;
-  }
-}, {passive: true});
-
-document.addEventListener('touchend', e => {
-  if (!ptr_pulling) return;
-  ptr_pulling = false;
-  const dy = e.changedTouches[0].clientY - ptr_startY;
-  const dx = e.changedTouches[0].clientX - ptr_startX;
-  // только вертикальный свайп вниз, чтобы не мешать горизонтальному скроллу/зуму
-  if (dy > 70 && Math.abs(dy) > Math.abs(dx) * 1.5 && day) {
-    delete hashes[day];
-    loadSchedule(day, false);
-  }
-}, {passive: true});
 
 const CALLS = {
   monday: {
@@ -744,271 +434,6 @@ function showCalls(tab) {
   document.getElementById('calls-out').innerHTML = html;
 }
 
-const nk = d => 'note_' + d;
-const ALL_DAYS = ['monday','tuesday','wednesday','thursday','friday','saturday','general'];
-
-function onNoteInput() {
-  const ta = document.getElementById('note-ta');
-  if (ta.value.length > NOTE_MAX) ta.value = ta.value.slice(0, NOTE_MAX);
-  document.getElementById('note-chars').textContent = ta.value.length + ' / ' + NOTE_MAX;
-  clearTimeout(saveT);
-  saveT = setTimeout(() => {
-    doSave();
-    const el = document.getElementById('note-saved');
-    el.style.opacity = '1';
-    setTimeout(() => el.style.opacity = '0', 1500);
-  }, 800);
-}
-
-function doSave() {
-  const d = document.getElementById('note-day').value;
-  const t = document.getElementById('note-ta').value.trim();
-  t ? localStorage.setItem(nk(d), t) : localStorage.removeItem(nk(d));
-  renderNotes(); updateBadge();
-}
-
-function saveNote() { doSave(); toast('Заметка сохранена ✓'); tg?.HapticFeedback?.notificationOccurred('success'); }
-
-function loadNote(d) {
-  document.getElementById('note-day').value = d;
-  const t = localStorage.getItem(nk(d)) || '';
-  document.getElementById('note-ta').value = t;
-  document.getElementById('note-chars').textContent = t.length + ' / ' + NOTE_MAX;
-}
-
-function delNote(d) {
-  localStorage.removeItem(nk(d));
-  if (document.getElementById('note-day').value === d) loadNote(d);
-  renderNotes(); updateBadge(); toast('Заметка удалена');
-}
-
-function renderNotes() {
-  const items = ALL_DAYS.map(d => ({d, t: localStorage.getItem(nk(d))})).filter(n => n.t);
-  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  document.getElementById('all-notes').innerHTML = items.length
-    ? items.map(n => `<div class="nitem"><div style="display:flex;align-items:center;justify-content:space-between;"><span class="ntag">${DNAMES[n.d]||n.d}</span><button class="dbtn" onclick="delNote('${n.d}')">✕</button></div><p class="ntxt">${esc(n.t)}</p></div>`).join('')
-    : `<div style="padding:24px;text-align:center;color:var(--sub);font-weight:700;font-size:14px;">Заметок пока нет</div>`;
-}
-
-function updateBadge() {
-  document.getElementById('notes-badge').classList.toggle('on', ALL_DAYS.some(d => localStorage.getItem(nk(d))));
-}
-
-const lightboxEl = document.getElementById('lightbox');
-const lightboxInner = document.getElementById('lightbox-inner');
-const lightboxImg = document.getElementById('lightbox-img');
-const lbZoomLabel = document.getElementById('lb-zoom-label');
-
-let lbZoom = 1, lbPanX = 0, lbPanY = 0;
-let lbDragging = false, lbDidDrag = false;
-let lbDragStartX = 0, lbDragStartY = 0, lbDragStartPanX = 0, lbDragStartPanY = 0;
-
-function updateLbTransform() {
-  lightboxInner.style.transform = `translate(${lbPanX}px, ${lbPanY}px) scale(${lbZoom})`;
-  lightboxInner.style.transformOrigin = 'center center';
-  if (lbZoomLabel) lbZoomLabel.textContent = Math.round(lbZoom * 100) + '%';
-}
-
-function setZoom(z, cx, cy) {
-  const newZ = Math.min(5, Math.max(1, z));
-  if (cx !== undefined && cy !== undefined) {
-    const rect = lightboxEl.getBoundingClientRect();
-    const ox = cx - rect.left - rect.width / 2;
-    const oy = cy - rect.top - rect.height / 2;
-    const ratio = newZ / lbZoom;
-    lbPanX = ox - ratio * (ox - lbPanX);
-    lbPanY = oy - ratio * (oy - lbPanY);
-  }
-  lbZoom = newZ;
-  if (lbZoom <= 1) { lbPanX = 0; lbPanY = 0; }
-  clampPan();
-  updateLbTransform();
-}
-
-function clampPan() {
-  if (lbZoom <= 1) { lbPanX = 0; lbPanY = 0; return; }
-  const rect = lightboxEl.getBoundingClientRect();
-  const imgW = lightboxImg.offsetWidth * lbZoom;
-  const imgH = lightboxImg.offsetHeight * lbZoom;
-  const maxX = Math.max(0, (imgW - rect.width) / 2);
-  const maxY = Math.max(0, (imgH - rect.height) / 2);
-  lbPanX = Math.min(maxX, Math.max(-maxX, lbPanX));
-  lbPanY = Math.min(maxY, Math.max(-maxY, lbPanY));
-}
-
-function resetLightbox() {
-  lbZoom = 1; lbPanX = 0; lbPanY = 0;
-  updateLbTransform();
-}
-
-function openLightbox(src) {
-  lightboxImg.src = src;
-  lightboxEl.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  resetLightbox();
-}
-
-function closeLightbox() {
-  lightboxEl.classList.remove('open');
-  document.body.style.overflow = '';
-  resetLightbox();
-}
-
-lightboxEl.addEventListener('click', e => {
-  if (lbDidDrag) { lbDidDrag = false; return; }
-  if (e.target === lightboxEl || e.target === lightboxInner) closeLightbox();
-});
-
-document.getElementById('lb-close').addEventListener('click', e => { e.stopPropagation(); closeLightbox(); });
-
-document.getElementById('lb-zin').addEventListener('click', e => {
-  e.stopPropagation();
-  const r = lightboxEl.getBoundingClientRect();
-  setZoom(lbZoom + 0.5, r.left + r.width / 2, r.top + r.height / 2);
-});
-document.getElementById('lb-zout').addEventListener('click', e => {
-  e.stopPropagation();
-  const r = lightboxEl.getBoundingClientRect();
-  setZoom(lbZoom - 0.5, r.left + r.width / 2, r.top + r.height / 2);
-});
-
-lightboxEl.addEventListener('wheel', e => {
-  e.preventDefault();
-  const delta = e.deltaY > 0 ? -0.25 : 0.25;
-  setZoom(lbZoom + delta, e.clientX, e.clientY);
-}, { passive: false });
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && lightboxEl.classList.contains('open')) closeLightbox();
-});
-
-lightboxImg.addEventListener('mousedown', e => {
-  if (lbZoom <= 1) return;
-  e.preventDefault();
-  lbDragging = true; lbDidDrag = false;
-  lbDragStartX = e.clientX; lbDragStartY = e.clientY;
-  lbDragStartPanX = lbPanX; lbDragStartPanY = lbPanY;
-});
-document.addEventListener('mousemove', e => {
-  if (!lbDragging) return;
-  const dx = e.clientX - lbDragStartX, dy = e.clientY - lbDragStartY;
-  if (Math.abs(dx) > 3 || Math.abs(dy) > 3) lbDidDrag = true;
-  lbPanX = lbDragStartPanX + dx; lbPanY = lbDragStartPanY + dy;
-  clampPan(); updateLbTransform();
-});
-document.addEventListener('mouseup', () => { lbDragging = false; });
-
-lightboxImg.addEventListener('dblclick', e => {
-  e.preventDefault(); e.stopPropagation();
-  lbZoom > 1 ? setZoom(1) : setZoom(2.5, e.clientX, e.clientY);
-});
-
-let pinching = false, pinchStartDist = 0, pinchStartZoom = 1;
-let touchPanning = false, tpStartX = 0, tpStartY = 0, tpStartPanX = 0, tpStartPanY = 0;
-
-function touchDist(a, b) { return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY); }
-
-lightboxEl.addEventListener('touchstart', e => {
-  if (e.touches.length === 2) {
-    pinching = true; touchPanning = false;
-    pinchStartDist = touchDist(e.touches[0], e.touches[1]);
-    pinchStartZoom = lbZoom;
-  } else if (lbZoom > 1 && e.touches.length === 1) {
-    touchPanning = true;
-    tpStartX = e.touches[0].clientX; tpStartY = e.touches[0].clientY;
-    tpStartPanX = lbPanX; tpStartPanY = lbPanY;
-  }
-}, { passive: true });
-
-lightboxEl.addEventListener('touchmove', e => {
-  if (pinching && e.touches.length === 2) {
-    const dist = touchDist(e.touches[0], e.touches[1]);
-    const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-    const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-    setZoom(pinchStartZoom * dist / (pinchStartDist || dist), cx, cy);
-    e.preventDefault(); return;
-  }
-  if (touchPanning && e.touches.length === 1) {
-    lbPanX = tpStartPanX + (e.touches[0].clientX - tpStartX);
-    lbPanY = tpStartPanY + (e.touches[0].clientY - tpStartY);
-    clampPan(); updateLbTransform(); e.preventDefault();
-  }
-}, { passive: false });
-
-lightboxEl.addEventListener('touchend', e => {
-  if (pinching && e.touches.length < 2) pinching = false;
-  if (e.touches.length === 0) touchPanning = false;
-}, { passive: true });
-
-const ZOOM_STEP = 200;
-const ZOOM_MAX  = 2000;
-
-function isMobile() { return window.innerWidth < 700; }
-
-function getZoomDefault() {
-  if (isMobile()) return window.innerWidth - 28; // карточка минус паддинги
-  return Math.round(Math.min(1100, window.innerWidth - 80) * 0.9);
-}
-
-function getZoomMin() {
-  // на мобиле можно уменьшить до 300 — скролл покажет всё
-  return isMobile() ? 300 : 500;
-}
-
-let cardZoom = 0;
-
-function setCardZoom(w) {
-  const def = getZoomDefault();
-  const zmin = getZoomMin();
-  cardZoom = Math.min(ZOOM_MAX, Math.max(zmin, w));
-
-  // на мобиле карточка всегда на весь экран, только inner скроллится
-  // на ПК карточка растёт вместе с inner
-  if (!isMobile()) {
-    const card = document.getElementById('schedule-card');
-    const appW = 520;
-    const extra = Math.max(0, (cardZoom - appW) / 2);
-    if (card) {
-      card.style.marginLeft = (-14 - extra) + 'px';
-      card.style.marginRight = (-14 - extra) + 'px';
-    }
-  }
-
-  const inner = document.getElementById('pages-inner');
-  if (inner) inner.style.width = cardZoom + 'px';
-  document.getElementById('zoom-pct').textContent = Math.round(cardZoom / def * 100) + '%';
-}
-
-document.getElementById('zbtn-in').addEventListener('click', () => setCardZoom(cardZoom + ZOOM_STEP));
-document.getElementById('zbtn-out').addEventListener('click', () => setCardZoom(cardZoom - ZOOM_STEP));
-document.getElementById('zoom-reset').addEventListener('click', () => setCardZoom(getZoomDefault()));
-document.getElementById('zoom-fs').addEventListener('click', () => {
-  const src = document.querySelector('#pages-inner img')?.src;
-  if (src) openLightbox(src);
-});
-
-async function shareImage(url) {
-  if (isTgWebApp) {
-    toast('Доступно в браузере');
-    return;
-  }
-  if (!navigator.share) {
-    toast('Поделиться не поддерживается в этом браузере');
-    return;
-  }
-  try {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    const ext = (blob.type || '').includes('png') ? 'png' : 'jpg';
-    const file = new File([blob], `schedule.${ext}`, { type: blob.type || 'image/jpeg' });
-    if (navigator.canShare && !navigator.canShare({ files: [file] })) {
-      toast('Поделиться не поддерживается');
-      return;
-    }
-    await navigator.share({ files: [file] });
-  } catch (_) {}
-}
-
 function openSupport() {
   const url = 'https://t.me/' + SUPPORT;
   if (isTgWebApp && tg && typeof tg.openTelegramLink === 'function') {
@@ -1018,15 +443,8 @@ function openSupport() {
   }
 }
 
-let toastT;
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('on');
-  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2300);
-}
-
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=21', { scope: './' });
+  navigator.serviceWorker.register('./sw.js?v=22', { scope: './' });
 }
 </script>
 </body>

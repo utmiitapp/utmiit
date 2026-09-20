@@ -1,4 +1,4 @@
-const CACHE = 'schedule-v26';
+const CACHE = 'schedule-v27';
 const IMG_CACHE = 'schedule-imgs-v1';
 const FONT_CACHE = 'schedule-fonts-v1';
 const INDEX = new URL('./index.html', self.location).pathname;
@@ -44,6 +44,18 @@ self.addEventListener('fetch', e => {
         caches.open(IMG_CACHE).then(c => c.put(e.request, copy));
         return res;
       }).catch(() => caches.match(e.request, { cacheName: IMG_CACHE }))
+    );
+    return;
+  }
+
+  // json расписания всегда берём из сети: кэш только на случай оффлайна,
+  // иначе после обновления сайт показывал бы старое расписание
+  if (url.pathname.endsWith('.json')) {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        if (res.ok) caches.open(CACHE).then(c => c.put(e.request, res.clone()));
+        return res;
+      }).catch(() => caches.match(e.request))
     );
     return;
   }
