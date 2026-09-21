@@ -125,6 +125,7 @@
     .cl-list > :last-child { border-bottom: none; }
 
     .lbody { padding-left: 42px; flex: 1; min-width: 0; }
+    .lrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 0; }
     .ltitle { font-size: 14px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .ltitle.miss { color: var(--sub); }
     .lroom { font-size: 12px; font-weight: 800; color: var(--acc); background: var(--acc-soft); border-radius: 7px; padding: 3px 8px; flex-shrink: 0; margin-left: 8px; }
@@ -275,6 +276,17 @@ function renderGroupList() {
   ).join('') + '</div>';
 }
 
+// Группа делится на подгруппы: парсер склеивает их в одну ячейку
+// ("МДК.11.02 (2), МДК.02.01 (1)" + "213, 212") - разбираем обратно по рядам
+function splitSubgroups(l) {
+  const subjects = (l.subject || '').split(/,\s*/);
+  const rooms = (l.classroom || '').split(/,\s*/);
+  if (subjects.length < 2 || subjects.length !== rooms.length) {
+    return [{subject: l.subject, classroom: l.classroom}];
+  }
+  return subjects.map((subject, i) => ({subject: subject.trim(), classroom: rooms[i].trim()}));
+}
+
 function selectGroup(name) {
   const card = document.getElementById('glessons-card');
   if (name === gSelectedGroup) {
@@ -305,11 +317,12 @@ function selectGroup(name) {
         continue;
       }
       counter++;
-      const room = (l.classroom || '').replace(/,/g, ', ');
+      const subs = splitSubgroups(l);
       rows += `<div class="cl-item">
         <div class="cl-num">${counter}</div>
-        <div class="lbody"><div class="ltitle">${l.subject ? escapeHtml(l.subject) : '—'}</div></div>
-        ${room ? `<div class="lroom">${escapeHtml(room)}</div>` : ''}
+        <div class="lbody">${subs.map(sub =>
+          `<div class="lrow"><div class="ltitle">${sub.subject ? escapeHtml(sub.subject) : '—'}</div>${sub.classroom ? `<div class="lroom">${escapeHtml(sub.classroom)}</div>` : ''}</div>`
+        ).join('')}</div>
       </div>`;
     }
   }
