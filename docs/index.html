@@ -329,7 +329,7 @@ const CALLS = {
       {n:3, p1:'13:05-13:50', p2:'13:55-14:40',  meal:null},
       {n:4, p1:'14:45-15:30', p2:'15:35-16:20',  meal:null},
     ],
-    breaks: [{after:2, text:'Обед 12:00-12:30 · Классные часы 12:30-13:00'}],
+    breaks: [{after:2, text:'Обед 12:00-12:30'}, {after:2, text:'Классные часы 12:30-13:00'}],
   },
   thursday: {
     lessons: [
@@ -361,7 +361,7 @@ function showCalls(tab) {
     html += `<div class="cl-item">
       <div class="cl-num">${l.n}</div>
       <div class="cl-part-l"><span class="cl-t">${l.p1}</span></div>
-      <div class="cl-meal">${l.meal ? '· ' + l.meal + ' ·' : ''}</div>
+      <div class="cl-meal">${l.meal ? 'Обед ' + l.meal : ''}</div>
       <div class="cl-part-r"><span class="cl-t">${l.p2}</span></div>
     </div>`;
     d.breaks.filter(b => b.after === l.n).forEach(b => {
