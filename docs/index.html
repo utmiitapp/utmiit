@@ -7,15 +7,10 @@
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-title" content="Расписание"/>
-  <meta name="theme-color" content="#4a5cf0"/>
+  <meta name="theme-color" content="#ffffff"/>
   <link rel="manifest" href="./manifest.json"/>
-
   <link rel="apple-touch-icon" href="icon-512.png"/>
   <script>
-    // Грузим telegram-web-app.js неблокирующе: страница не должна ждать
-    // этот скрипт, если telegram.org недоступен (например, в РФ без VPN).
-    // Ждём не дольше 1 секунды — этого достаточно, если сайт открыт
-    // внутри самого Telegram, и не создаёт заметной задержки в обычном браузере.
     window.__tgScriptLoaded = new Promise(function (resolve) {
       var s = document.createElement('script');
       s.src = 'https://telegram.org/js/telegram-web-app.js';
@@ -26,111 +21,91 @@
       setTimeout(function () { resolve(false); }, 1000);
     });
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet"/>
   <style>
-
     :root {
-      --bg: #f3f4f7; --surf: #fff; --surf2: #ececf1;
-      --text: #16171c; --sub: #6b6d78;
-      --acc: #4a5cf0; --acc-soft: rgba(74,92,240,.12); --acct: #fff;
-      --danger: #ff3b30; --ok: #34c759;
-      --brd: rgba(0,0,0,.09); --shad: none;
-      --shad-sm: none;
-      --radius: 16px;
+      --bg: #fafafa; --surf: #fff; --line: #e4e4e7;
+      --text: #111; --sub: #71717a;
+      --acc: #111; --acc-text: #fff;
+      --danger: #dc2626;
     }
     [data-theme="dark"] {
-      --bg: #131318; --surf: #1b1c22; --surf2: #24252c;
-      --text: #f2f2f5; --sub: #8b8d99;
-      --acc-soft: rgba(107,122,255,.16);
-      --brd: rgba(255,255,255,.09); --shad: none;
-      --shad-sm: none;
+      --bg: #0a0a0a; --surf: #141414; --line: #262626;
+      --text: #fafafa; --sub: #a1a1aa;
+      --acc: #fafafa; --acc-text: #0a0a0a;
+      --danger: #ef4444;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: pan-x pan-y pinch-zoom; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     ::-webkit-scrollbar { display: none; }
-    body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; overscroll-behavior: none; transition: background .2s, color .2s; }
-    #app { max-width: 520px; margin: 0 auto; padding: 0 14px 90px; }
+    body {
+      font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100dvh; overscroll-behavior: none;
+      font-size: 15px; line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: 'tnum';
+    }
+    #app { max-width: 520px; margin: 0 auto; padding: 0 16px 96px; }
+    button { font: inherit; color: inherit; }
 
-    .row  { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; }
-    .row:not(:last-child) { border-bottom: 1px solid var(--brd); }
-    .row:active { opacity: .6; }
-    .row-left { display: flex; align-items: center; gap: 14px; }
-    .row-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .row-icon svg { width: 20px; height: 20px; }
-    .row-icon.green { background: rgba(52,199,89,.15);  color: var(--ok); }
-    .row-title { font-weight: 800; font-size: 15px; }
-    .chevron   { color: var(--sub); opacity: .5; }
-    .chevron svg { width: 16px; height: 16px; }
-
-    .ibtn { width: 36px; height: 36px; border-radius: 50%; background: var(--surf); border: 1px solid var(--brd); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shad); color: var(--text); transition: transform .15s; position: relative; }
-    .ibtn:active { transform: scale(.88); }
-    .ibtn svg { width: 17px; height: 17px; }
-
-    .topbar { display: flex; align-items: flex-start; justify-content: space-between; padding: 18px 0 14px; }
-    .topbar h1 { font-size: 24px; font-weight: 900; letter-spacing: -.5px; }
-    .topbar .sub { font-size: 12px; font-weight: 600; color: var(--sub); margin-top: 2px; }
-    .tr { display: flex; gap: 8px; margin-top: 4px; }
-
-    .bnav { position: fixed; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); left: 14px; right: 14px; max-width: 492px; margin: 0 auto; background: var(--surf); border: 1px solid var(--brd); border-radius: 20px; display: flex; z-index: 100; box-shadow: var(--shad); }
-    .nb { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 4px 8px; gap: 3px; cursor: pointer; font-size: 10px; font-weight: 800; color: var(--sub); transition: color .15s; border: none; background: none; font-family: 'Nunito', sans-serif; }
-    .nb svg { width: 22px; height: 22px; }
-    .nb .dot { width: 4px; height: 4px; border-radius: 50%; background: transparent; margin-top: 1px; }
-    .nb.active { color: var(--acc); }
-    .nb.active .dot { background: var(--acc); }
+    .topbar { display: flex; align-items: flex-end; justify-content: space-between; padding: 28px 0 20px; }
+    .topbar h1 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+    .topbar .sub { font-size: 13px; color: var(--sub); margin-top: 3px; }
+    .ibtn { width: 34px; height: 34px; border: 1px solid var(--line); background: var(--surf); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text); }
+    .ibtn svg { width: 16px; height: 16px; }
 
     .page { display: none; }
-    .page.active { display: block; animation: up .2s ease; }
-    @keyframes up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    #page-schedule .topbar { opacity: 0; animation: fadeUp .45s ease forwards; }
-    #page-schedule .dgrid { opacity: 0; animation: fadeUp .45s .06s ease forwards; }
+    .page.active { display: block; }
 
-    .dgrid { display: grid; grid-template-columns: repeat(6,1fr); gap: 7px; margin-bottom: 18px; }
-    .dbn { background: var(--surf); color: var(--sub); border: 1px solid var(--brd); border-radius: 12px; padding: 11px 0 9px; cursor: pointer; font-family: 'Nunito',sans-serif; font-weight: 800; font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 5px; box-shadow: var(--shad-sm); transition: background .15s, color .15s, transform .1s; }
-    .dbn .dot { width: 5px; height: 5px; border-radius: 50%; background: transparent; }
-    .dbn.today .dot { background: var(--danger); }
-    .dbn.active { background: var(--acc); color: var(--acct); border-color: var(--acc); box-shadow: none; }
-    .dbn.active .dot { background: rgba(255,255,255,.55); }
-    .dbn:active { transform: scale(.92); }
+    .dgrid { display: grid; grid-template-columns: repeat(6, 1fr); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+    .dbn { position: relative; background: var(--surf); border: none; border-right: 1px solid var(--line); padding: 12px 0; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--sub); }
+    .dbn:last-child { border-right: none; }
+    .dbn.today::after { content: ''; position: absolute; top: 6px; right: 6px; width: 5px; height: 5px; border-radius: 50%; background: var(--danger); }
+    .dbn.active { background: var(--acc); color: var(--acc-text); }
 
-    .empty-s { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 40px 0; color: var(--sub); font-weight: 700; font-size: 15px; }
-    .empty-s svg { width: 52px; height: 52px; opacity: .35; }
+    .card { background: var(--surf); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
 
-    .card { background: var(--surf); border: 1px solid var(--brd); border-radius: 18px; box-shadow: var(--shad); overflow: hidden; }
+    .ggrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); }
+    .gbtn { background: var(--surf); border: none; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 11px 2px; cursor: pointer; font-size: 13px; font-weight: 600; text-align: center; color: var(--text); }
+    .gbtn.active { background: var(--acc); color: var(--acc-text); }
 
-    .ggrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 7px; padding: 12px; }
-    .gbtn { background: var(--surf); color: var(--text); border: 1px solid var(--brd); border-radius: 12px; padding: 10px 4px; cursor: pointer; font-family: 'Nunito',sans-serif; font-weight: 800; font-size: 13px; text-align: center; transition: background .15s, color .15s, transform .1s; }
-    .gbtn.active { background: var(--acc); color: var(--acct); border-color: var(--acc); }
-    .gbtn:active { transform: scale(.93); }
+    .empty-s { padding: 44px 0; text-align: center; color: var(--sub); font-size: 14px; }
 
-    .pills { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
-    .pills::-webkit-scrollbar { display: none; }
-    .pill { background: var(--surf); border: 1px solid var(--brd); border-radius: 20px; padding: 8px 14px; font-family: 'Nunito',sans-serif; font-weight: 800; font-size: 13px; color: var(--sub); cursor: pointer; white-space: nowrap; box-shadow: var(--shad-sm); transition: all .2s ease; }
-    .pill.active { background: var(--acc); color: var(--acct); border-color: var(--acc); box-shadow: none; }
-    .pill:active { transform: scale(0.95); }
-    .cl-list { display: flex; flex-direction: column; }
-    .cl-item { display: flex; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--brd); position: relative; }
-    .cl-num { position: absolute; left: 12px; width: 30px; height: 30px; border-radius: 10px; background: var(--acc-soft); color: var(--acc); font-weight: 900; font-size: 14px; display: flex; align-items: center; justify-content: center; }
-    .cl-times { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; width: 100%; padding-left: 42px; }
-    .cl-part-l { display: flex; flex-direction: column; gap: 1px; align-items: flex-start; }
-    .cl-part-r { display: flex; flex-direction: column; gap: 1px; align-items: flex-end; text-align: right; }
-    .cl-t { font-size: 14px; font-weight: 800; letter-spacing: -0.2px; white-space: nowrap; }
-    .cl-s { font-size: 11px; font-weight: 700; color: var(--sub); white-space: nowrap; }
-    .cl-mid { display: flex; align-items: center; justify-content: center; }
-    .cl-dash { width: 10px; height: 2px; background: var(--surf2); border-radius: 2px; }
-    .cl-meal { font-size: 11px; font-weight: 800; color: #ff9500; background: rgba(255,149,0,.15); border-radius: 6px; padding: 3px 7px; white-space: nowrap; }
-    .cl-break { padding: 8px 12px; font-size: 12px; font-weight: 800; color: var(--sub); background: var(--bg); border-bottom: 1px solid var(--brd); display: flex; justify-content: center; align-items: center; text-align: center; }
+    .ghead { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    .ghead .gname { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+    .ghead .gsub { font-size: 12px; color: var(--sub); margin-top: 2px; }
+
+    .lesson { display: flex; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--line); }
+    .lesson:last-child { border-bottom: none; }
+    .lnum { width: 22px; flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--sub); padding-top: 2px; }
+    .lbody { flex: 1; min-width: 0; }
+    .lrow { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 1px 0; }
+    .lsubj { font-size: 14px; font-weight: 500; }
+    .lsubj.miss { color: var(--sub); }
+    .lroom { font-size: 13px; color: var(--sub); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+    .note-row { padding: 7px 16px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--sub); background: var(--bg); }
+    .note-row:last-child { border-bottom: none; }
+
+    .pills { display: flex; gap: 6px; margin-bottom: 16px; }
+    .pill { flex: 1; background: var(--surf); border: 1px solid var(--line); border-radius: 8px; padding: 9px 0; font-size: 13px; font-weight: 600; color: var(--sub); cursor: pointer; text-align: center; }
+    .pill.active { background: var(--acc); color: var(--acc-text); border-color: var(--acc); }
+
+    .cl-item { display: grid; grid-template-columns: 30px 1fr auto 1fr; align-items: center; gap: 4px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    .cl-num { font-size: 13px; font-weight: 700; color: var(--sub); }
+    .cl-t { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .cl-part-l, .cl-part-r { display: flex; flex-direction: column; }
+    .cl-part-r { text-align: right; }
+    .cl-meal { font-size: 11px; color: var(--sub); text-align: center; }
+    .cl-break { padding: 8px 16px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--sub); text-align: center; background: var(--bg); }
     .cl-list > :last-child { border-bottom: none; }
 
-    .lbody { padding-left: 42px; flex: 1; min-width: 0; }
-    .lrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 0; }
-    .ltitle { font-size: 14px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .ltitle.miss { color: var(--sub); }
-    .lroom { font-size: 12px; font-weight: 800; color: var(--acc); background: var(--acc-soft); border-radius: 7px; padding: 3px 8px; flex-shrink: 0; margin-left: 8px; }
-    .row-sub { font-size: 11px; font-weight: 700; color: var(--sub); margin-top: 2px; }
+    .row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; }
+    .row-title { font-size: 15px; font-weight: 600; }
+    .chevron { color: var(--sub); }
 
+    .bnav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surf); border-top: 1px solid var(--line); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .nb { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 0 8px; cursor: pointer; font-size: 11px; font-weight: 600; color: var(--sub); border: none; background: none; }
+    .nb svg { width: 20px; height: 20px; }
+    .nb.active { color: var(--text); }
   </style>
 </head>
 <body>
@@ -138,47 +113,41 @@
 
   <div id="page-schedule" class="page active">
     <div class="topbar">
-      <div><h1>📚Расписание</h1><div class="sub" id="date-line"></div></div>
-      <div class="tr">
-        <button class="ibtn" id="theme-btn" onclick="toggleTheme()">
-          <svg id="theme-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        </button>
-      </div>
+      <div><h1>Расписание</h1><div class="sub" id="date-line"></div></div>
+      <button class="ibtn" id="theme-btn" onclick="toggleTheme()" aria-label="Тема">
+        <svg id="theme-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
     </div>
 
     <div class="dgrid" id="gdgrid">
-      <button class="dbn" data-gday="monday"    onclick="selectGroupDay('monday')">   <span>Пн</span><span class="dot"></span></button>
-      <button class="dbn" data-gday="tuesday"   onclick="selectGroupDay('tuesday')">  <span>Вт</span><span class="dot"></span></button>
-      <button class="dbn" data-gday="wednesday" onclick="selectGroupDay('wednesday')"><span>Ср</span><span class="dot"></span></button>
-      <button class="dbn" data-gday="thursday"  onclick="selectGroupDay('thursday')"> <span>Чт</span><span class="dot"></span></button>
-      <button class="dbn" data-gday="friday"    onclick="selectGroupDay('friday')">   <span>Пт</span><span class="dot"></span></button>
-      <button class="dbn" data-gday="saturday"  onclick="selectGroupDay('saturday')"> <span>Сб</span><span class="dot"></span></button>
+      <button class="dbn" data-gday="monday"    onclick="selectGroupDay('monday')">Пн</button>
+      <button class="dbn" data-gday="tuesday"   onclick="selectGroupDay('tuesday')">Вт</button>
+      <button class="dbn" data-gday="wednesday" onclick="selectGroupDay('wednesday')">Ср</button>
+      <button class="dbn" data-gday="thursday"  onclick="selectGroupDay('thursday')">Чт</button>
+      <button class="dbn" data-gday="friday"    onclick="selectGroupDay('friday')">Пт</button>
+      <button class="dbn" data-gday="saturday"  onclick="selectGroupDay('saturday')">Сб</button>
     </div>
 
-    <div class="card" id="glist-card" style="margin-bottom: 14px;"></div>
-    <div class="card" id="glessons-card" style="display: none;"></div>
+    <div class="card" id="glist-card" style="margin-bottom:16px;"></div>
+    <div class="card" id="glessons-card" style="display:none;"></div>
   </div>
 
   <div id="page-calls" class="page">
-    <div class="topbar"><div><h1>🔔Звонки</h1></div></div>
+    <div class="topbar"><div><h1>Звонки</h1></div></div>
     <div class="pills">
-      <button class="pill active" id="pill-monday"   onclick="showCalls('monday')">Понедельник</button>
-      <button class="pill"        id="pill-thursday" onclick="showCalls('thursday')">Четверг</button>
-      <button class="pill"        id="pill-other"    onclick="showCalls('other')">Другие дни</button>
+      <button class="pill active" id="pill-monday"   onclick="showCalls('monday')">Пн</button>
+      <button class="pill"        id="pill-thursday" onclick="showCalls('thursday')">Чт</button>
+      <button class="pill"        id="pill-other"    onclick="showCalls('other')">Остальные</button>
     </div>
     <div class="card" id="calls-out"></div>
   </div>
 
   <div id="page-other" class="page">
-    <div class="topbar"><div><h1>📋Другое</h1></div></div>
-
-    <div class="card" style="margin-bottom:10px;">
+    <div class="topbar"><div><h1>Другое</h1></div></div>
+    <div class="card">
       <div class="row" onclick="openSupport()">
-        <div class="row-left">
-          <div class="row-icon green"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
-          <div><div class="row-title">Написать в поддержку</div></div>
-        </div>
-        <div class="chevron"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></div>
+        <div class="row-title">Написать в поддержку</div>
+        <div class="chevron"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><path d="M9 18l6-6-6-6"/></svg></div>
       </div>
     </div>
   </div>
@@ -187,28 +156,32 @@
 
 <nav class="bnav">
   <button class="nb active" id="nav-schedule" onclick="setPage('schedule')">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>
-    Расписание<span class="dot"></span>
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>
+    Расписание
   </button>
   <button class="nb" id="nav-calls" onclick="setPage('calls')">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-    Звонки<span class="dot"></span>
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    Звонки
   </button>
   <button class="nb" id="nav-other" onclick="setPage('other')">
-    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-    Другое<span class="dot"></span>
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+    Другое
   </button>
 </nav>
 
-<script>
 
+<script>
 const STATIC_BASE = './schedule';
 const SUPPORT = 'ueaio';
+const THEME_KEY = 'theme';
+const DAYS = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 
 let tg = null;
 let isTgWebApp = false;
+let gDay = null, gSelectedGroup = null;
+const GROUPS_CACHE = {};
+const NON_LESSON_RE = /^классный\s*час/i;
 
-// telegram-web-app.js грузится асинхронно (см. <head>) - ждём его до секунды
 async function initTelegram() {
   await window.__tgScriptLoaded;
   tg = window.Telegram?.WebApp || null;
@@ -217,22 +190,12 @@ async function initTelegram() {
     tg.ready();
     tg.expand();
     tg.disableVerticalSwipes?.();
-    if (tg.onEvent) {
-      tg.onEvent('themeChanged', () => {
-        if (localStorage.getItem(THEME_KEY)) return;
-        const scheme = tg.colorScheme;
-        if (scheme === 'dark' || scheme === 'light') applyTheme(scheme);
-      });
-    }
+    tg.onEvent?.('themeChanged', () => {
+      if (localStorage.getItem(THEME_KEY)) return;
+      if (tg.colorScheme === 'dark' || tg.colorScheme === 'light') applyTheme(tg.colorScheme);
+    });
   }
 }
-
-const DAYS   = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-
-// --- Группы: выбор дня + группы, список пар текстом (как в боте) ---
-let gDay = null, gSelectedGroup = null;
-const GROUPS_CACHE = {};
-const NON_LESSON_RE = /^классный\s*час/i;
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -249,13 +212,12 @@ async function selectGroupDay(d) {
 
 async function loadGroupsDay(d) {
   if (GROUPS_CACHE[d] && GROUPS_CACHE[d] !== 'error') return;
-  const card = document.getElementById('glist-card');
-  card.innerHTML = `<div class="empty-s" style="padding:30px 0;"><span>Загрузка…</span></div>`;
+  document.getElementById('glist-card').innerHTML = '<div class="empty-s">Загрузка…</div>';
   try {
     const res = await fetch(`${STATIC_BASE}/groups/${d}.json?ts=${Date.now()}`, {cache: 'no-store'});
-    if (!res.ok) throw new Error('nf');
+    if (!res.ok) throw 0;
     GROUPS_CACHE[d] = await res.json();
-  } catch (e) {
+  } catch {
     GROUPS_CACHE[d] = 'error';
   }
 }
@@ -263,21 +225,14 @@ async function loadGroupsDay(d) {
 function renderGroupList() {
   const card = document.getElementById('glist-card');
   const data = GROUPS_CACHE[gDay];
-  const showEmpty = msg => {
-    card.innerHTML = `<div class="empty-s" style="padding:30px 0;">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.3"><circle cx="9" cy="7" r="4"/><path d="M2 21v-1a7 7 0 0114 0v1"/><circle cx="17" cy="8" r="3"/><path d="M22 21v-1a5 5 0 00-4-4.9"/></svg>
-      <span>${msg}</span></div>`;
-  };
-  if (data === 'error') return showEmpty('Данные ещё не загружены');
+  if (data === 'error') { card.innerHTML = '<div class="empty-s">Данные ещё не загружены</div>'; return; }
   const names = Object.keys(data?.groups || {});
-  if (!names.length) return showEmpty('Замен на этот день нет');
+  if (!names.length) { card.innerHTML = '<div class="empty-s">Замен на этот день нет</div>'; return; }
   card.innerHTML = '<div class="ggrid">' + names.map(name =>
     `<button class="gbtn${name === gSelectedGroup ? ' active' : ''}" onclick="selectGroup('${name.replace(/'/g, "\\'")}')">${escapeHtml(name)}</button>`
   ).join('') + '</div>';
 }
 
-// Группа делится на подгруппы: парсер склеивает их в одну ячейку
-// ("МДК.11.02 (2), МДК.02.01 (1)" + "213, 212") - разбираем обратно по рядам
 function splitSubgroups(l) {
   const subjects = (l.subject || '').split(/,\s*/);
   const rooms = (l.classroom || '').split(/,\s*/);
@@ -299,82 +254,56 @@ function selectGroup(name) {
   const data = GROUPS_CACHE[gDay];
   const lessons = (data.groups[name] || []).slice().sort((a, b) => a.n - b.n);
   card.style.display = '';
+
   let rows = '';
   if (!lessons.length) {
-    rows = `<div class="cl-break">На этот день занятий нет 🎉</div>`;
+    rows = '<div class="note-row">На этот день занятий нет</div>';
   } else {
     const bySlot = new Map(lessons.map(l => [l.n, l]));
-    let counter = 0;
+    let n = 0;
     for (let slot = 1; slot <= lessons[lessons.length - 1].n; slot++) {
       const l = bySlot.get(slot);
       if (!l) {
-        counter++;
-        rows += `<div class="cl-item"><div class="cl-num">${counter}</div><div class="lbody"><div class="ltitle miss">—</div></div></div>`;
+        rows += `<div class="lesson"><div class="lnum">${++n}</div><div class="lbody"><div class="lrow"><span class="lsubj miss">—</span></div></div></div>`;
         continue;
       }
       if (l.subject && NON_LESSON_RE.test(l.subject)) {
-        rows += `<div class="cl-break">⏳ Классный час</div>`;
+        rows += '<div class="note-row">Классный час</div>';
         continue;
       }
-      counter++;
-      const subs = splitSubgroups(l);
-      rows += `<div class="cl-item">
-        <div class="cl-num">${counter}</div>
-        <div class="lbody">${subs.map(sub =>
-          `<div class="lrow"><div class="ltitle">${sub.subject ? escapeHtml(sub.subject) : '—'}</div>${sub.classroom ? `<div class="lroom">${escapeHtml(sub.classroom)}</div>` : ''}</div>`
-        ).join('')}</div>
-      </div>`;
+      n++;
+      rows += `<div class="lesson"><div class="lnum">${n}</div><div class="lbody">${splitSubgroups(l).map(s =>
+        `<div class="lrow"><span class="lsubj${s.subject ? '' : ' miss'}">${s.subject ? escapeHtml(s.subject) : '—'}</span>${s.classroom ? `<span class="lroom">${escapeHtml(s.classroom)}</span>` : ''}</div>`
+      ).join('')}</div></div>`;
     }
   }
+
   const dateLine = data.source_date ? ` · ${escapeHtml(data.source_date)}` : '';
   card.innerHTML = `
-    <div class="row" style="cursor:default;">
-      <div><div class="row-title">${escapeHtml(name)}</div><div class="row-sub">${escapeHtml(data.day_title)}${dateLine}</div></div>
-    </div>
+    <div class="ghead"><div class="gname">${escapeHtml(name)}</div><div class="gsub">${escapeHtml(data.day_title)}${dateLine}</div></div>
     ${rows}`;
   renderGroupList();
   card.scrollIntoView({behavior: 'smooth', block: 'nearest'});
 }
 
-const THEME_KEY = 'theme';
-
-window.addEventListener('DOMContentLoaded', async () => {
-  await initTelegram();
-  initTheme();
-
-  const s = new Date().toLocaleDateString('ru-RU', {weekday:'long',day:'numeric',month:'long'});
-  document.getElementById('date-line').textContent = s[0].toUpperCase() + s.slice(1);
-
-  const today = DAYS[new Date().getDay()];
-  document.querySelector(`[data-gday="${today}"]`)?.classList.add('today');
-
-  showCalls('monday');
-  setPage('schedule');
-});
-
-
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', t === 'dark' ? '#1b1c22' : '#4a5cf0');
-  tg?.setHeaderColor?.(t === 'dark' ? '#1b1c22' : '#4a5cf0');
-  tg?.setBackgroundColor?.(t === 'dark' ? '#131318' : '#f3f4f7');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', t === 'dark' ? '#0a0a0a' : '#ffffff');
+  tg?.setHeaderColor?.(t === 'dark' ? '#0a0a0a' : '#ffffff');
+  tg?.setBackgroundColor?.(t === 'dark' ? '#0a0a0a' : '#fafafa');
   document.getElementById('theme-icon').innerHTML = t === 'light'
-    ? `<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`
-    : `<path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>`;
+    ? '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>'
+    : '<path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>';
 }
 
 function initTheme() {
   const saved = localStorage.getItem(THEME_KEY);
   if (saved) { applyTheme(saved); return; }
-  const scheme = tg?.colorScheme;
-  if (scheme === 'dark' || scheme === 'light') applyTheme(scheme);
-  else applyTheme('light');
+  applyTheme(tg?.colorScheme === 'dark' ? 'dark' : 'light');
 }
 
 function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme') || 'light';
-  const t = current === 'light' ? 'dark' : 'light';
+  const t = (document.documentElement.getAttribute('data-theme') || 'light') === 'light' ? 'dark' : 'light';
   localStorage.setItem(THEME_KEY, t);
   applyTheme(t);
 }
@@ -386,42 +315,40 @@ function setPage(p) {
   document.getElementById('nav-' + p)?.classList.add('active');
   if (p === 'schedule' && !gDay) {
     const t = DAYS[new Date().getDay()];
-    gDay = t === 'sunday' ? 'monday' : t;
-    selectGroupDay(gDay);
+    selectGroupDay(t === 'sunday' ? 'monday' : t);
   }
   window.scrollTo(0, 0);
 }
-
 
 
 const CALLS = {
   monday: {
     lessons: [
       {n:1, p1:'8:30-9:15',   p2:'9:20-10:05',  meal:null},
-      {n:2, p1:'10:15-11:00', p2:'11:15-12:00',  meal:'🍴 11:00-11:15'},
+      {n:2, p1:'10:15-11:00', p2:'11:15-12:00',  meal:'11:00-11:15'},
       {n:3, p1:'13:05-13:50', p2:'13:55-14:40',  meal:null},
       {n:4, p1:'14:45-15:30', p2:'15:35-16:20',  meal:null},
     ],
-    breaks: [{after:2, text:'🍴 Обед  12:00-12:30'}, {after:2, text:'🕐 Классные часы  12:30-13:00'}],
+    breaks: [{after:2, text:'Обед 12:00-12:30 · Классные часы 12:30-13:00'}],
   },
   thursday: {
     lessons: [
       {n:1, p1:'8:30-9:15',   p2:'9:20-10:05',  meal:null},
-      {n:2, p1:'10:15-11:00', p2:'11:15-12:00',  meal:'🍴 11:00-11:15'},
+      {n:2, p1:'10:15-11:00', p2:'11:15-12:00',  meal:'11:00-11:15'},
       {n:3, p1:'12:30-13:15', p2:'13:20-14:05',  meal:null},
       {n:4, p1:'14:10-14:55', p2:'15:00-15:45',  meal:null},
     ],
-    breaks: [{after:2, text:'🍴 Обед  12:00-12:30'}, {after:4, text:'🕐 Классные часы (1 курс): 15:50-16:20'}],
+    breaks: [{after:2, text:'Обед 12:00-12:30'}, {after:4, text:'Классные часы (1 курс) 15:50-16:20'}],
   },
   other: {
     lessons: [
       {n:1, p1:'8:30-9:15',   p2:'9:20-10:05',  meal:null},
-      {n:2, p1:'10:15-11:00', p2:'11:15-12:00',  meal:'🍴 11:00-11:15'},
+      {n:2, p1:'10:15-11:00', p2:'11:15-12:00',  meal:'11:00-11:15'},
       {n:3, p1:'12:40-13:25', p2:'13:30-14:15',  meal:null},
       {n:4, p1:'14:25-15:10', p2:'15:15-16:00',  meal:null},
       {n:5, p1:'16:05-16:50', p2:'16:55-17:40',  meal:null},
     ],
-    breaks: [{after:2, text:'🍴 Обед  12:00-12:40'}],
+    breaks: [{after:2, text:'Обед 12:00-12:40'}],
   },
 };
 
@@ -433,31 +360,39 @@ function showCalls(tab) {
   d.lessons.forEach(l => {
     html += `<div class="cl-item">
       <div class="cl-num">${l.n}</div>
-      <div class="cl-times">
-        <div class="cl-part-l"><span class="cl-t">${l.p1}</span><span class="cl-s">1-я часть</span></div>
-        <div class="cl-mid">${l.meal ? `<div class="cl-meal">${l.meal}</div>` : `<div class="cl-dash"></div>`}</div>
-        <div class="cl-part-r"><span class="cl-t">${l.p2}</span><span class="cl-s">2-я часть</span></div>
-      </div>
+      <div class="cl-part-l"><span class="cl-t">${l.p1}</span></div>
+      <div class="cl-meal">${l.meal ? '· ' + l.meal + ' ·' : ''}</div>
+      <div class="cl-part-r"><span class="cl-t">${l.p2}</span></div>
     </div>`;
     d.breaks.filter(b => b.after === l.n).forEach(b => {
       html += `<div class="cl-break">${b.text}</div>`;
     });
   });
-  html += '</div>';
-  document.getElementById('calls-out').innerHTML = html;
+  document.getElementById('calls-out').innerHTML = html + '</div>';
 }
 
 function openSupport() {
   const url = 'https://t.me/' + SUPPORT;
-  if (isTgWebApp && tg && typeof tg.openTelegramLink === 'function') {
-    tg.openTelegramLink(url);
-  } else {
-    window.open(url, '_blank', 'noopener');
-  }
+  if (isTgWebApp && tg && typeof tg.openTelegramLink === 'function') tg.openTelegramLink(url);
+  else window.open(url, '_blank', 'noopener');
 }
 
+window.addEventListener('DOMContentLoaded', async () => {
+  await initTelegram();
+  initTheme();
+
+  const s = new Date().toLocaleDateString('ru-RU', {weekday:'long', day:'numeric', month:'long'});
+  document.getElementById('date-line').textContent = s[0].toUpperCase() + s.slice(1);
+
+  const today = DAYS[new Date().getDay()];
+  document.querySelector(`[data-gday="${today}"]`)?.classList.add('today');
+
+  showCalls('monday');
+  setPage('schedule');
+});
+
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js?v=22', { scope: './' });
+  navigator.serviceWorker.register('./sw.js?v=23', { scope: './' });
 }
 </script>
 </body>
