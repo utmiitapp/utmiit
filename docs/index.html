@@ -52,6 +52,8 @@ h1 { font-size:28px; font-weight:600; letter-spacing:-.03em; line-height:1.1; }
 .sheet-head span { font-size:12px; color:var(--mute); }
 .row { display:grid; grid-template-columns:28px 1fr; padding:14px 0; border-bottom:1px solid var(--line); }
 .n { font-size:12px; color:var(--mute); padding-top:3px; }
+.timed .n { padding-top:23px; }
+.calls-row .n { padding-top:17px; }
 .line { display:flex; justify-content:space-between; gap:16px; }
 .room { color:var(--mute); font-size:13px; flex-shrink:0; }
 .dim { color:var(--mute); }
@@ -198,7 +200,7 @@ function lessonRows(lessons) {
       ? splitSubgroups(lesson).map(s => `<div class="line"><span class="${s.subject ? '' : 'dim'}">${s.subject ? esc(s.subject) : '—'}</span>${s.classroom ? `<span class="room">${esc(s.classroom)}</span>` : ''}</div>`).join('')
       : '<div class="line"><span class="dim">—</span></div>';
     const [, a, b] = times[count] || [];
-    html += `<div class="row"><div class="n">${++count}</div><div>${a ? `<div class="time">${a} | ${b}</div>` : ''}${lines}</div></div>`;
+    html += `<div class="row${a ? ' timed' : ''}"><div class="n">${++count}</div><div>${a ? `<div class="time">${a} | ${b}</div>` : ''}${lines}</div></div>`;
   }
   return html;
 }
@@ -222,7 +224,7 @@ function showCalls(kind) {
   $('call-list').innerHTML = lessons.map(([n, a, b, meal]) => {
     const breaks = (after[n] || []).map(text => `<div class="call-sep">${esc(text)}</div>`).join('');
     const middle = meal ? `<div class="call-between">${esc(meal)}</div>` : '';
-    return `<div class="row"><div class="n">${n}</div><div class="call-parts${meal ? ' with-meal' : ''}"><div class="call-part"><span class="call-part-label">1-я часть</span><strong class="call-part-time">${esc(a)}</strong></div>${middle}<div class="call-part"><span class="call-part-label">2-я часть</span><strong class="call-part-time">${esc(b)}</strong></div></div></div>${breaks}`;
+    return `<div class="row calls-row"><div class="n">${n}</div><div class="call-parts${meal ? ' with-meal' : ''}"><div class="call-part"><span class="call-part-label">1-я часть</span><strong class="call-part-time">${esc(a)}</strong></div>${middle}<div class="call-part"><span class="call-part-label">2-я часть</span><strong class="call-part-time">${esc(b)}</strong></div></div></div>${breaks}`;
   }).join('');
 }
 
