@@ -1,4 +1,4 @@
-const CACHE = 'schedule-v29';
+const CACHE = 'schedule-v30';
 const INDEX = new URL('./index.html', self.location).pathname;
 
 self.addEventListener('install', e => e.waitUntil(
